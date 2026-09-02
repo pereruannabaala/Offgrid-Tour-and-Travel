@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OFFGRID MAASAI ADVENTURES LTD</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Playfair Display, Lato & Alex Brush -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --earth-sand: #f8f5f0;        /* Linen / Cream background */
+            --earth-clay: #2c221e;        /* Deep brown body text */
+            --earth-terracotta: #a65d37;  /* Warm accent / Subtitles */
+            --earth-terracotta-hover: #8e4c2a;
+            --earth-olive: #5b6347;       /* Soft olive accents */
+            --earth-border: #e2dacd;      /* Subtle organic borders */
+            --brand-dark: #0b0f19;        /* Hero background */
+            --brand-accent: #cadb7b;      /* Hero highlight */
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--brand-dark);
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, .font-serif {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* Curly Script Font Class */
+        .font-script {
+            font-family: 'Alex Brush', cursive;
+            font-weight: 400;
+            text-transform: none;
+        }
+
+        .navbar-custom {
+            background: rgba(11, 15, 25, 0.7);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 1.5px;
+            font-size: 1.25rem;
+        }
+
+        .nav-link {
+            font-family: 'Lato', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.85) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--brand-accent) !important;
+        }
+
+        .btn-light-brown {
+            background-color: var(--earth-terracotta);
+            color: #ffffff;
+            border: none;
+            font-family: 'Lato', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .btn-light-brown:hover {
+            background-color: var(--earth-terracotta-hover);
+            color: #ffffff;
+        }
+
+        /* Earth-Toned Utility Classes */
+        .bg-earth-sand {
+            background-color: var(--earth-sand);
+            color: var(--earth-clay);
+        }
+
+        .text-terracotta {
+            color: var(--earth-terracotta);
+        }
+
+        .text-earth-dark {
+            color: var(--earth-clay);
+        }
+
+        .earth-img-frame {
+            border-radius: 4px;
+            box-shadow: 0 12px 30px rgba(44, 34, 30, 0.08);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .earth-img-frame:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 40px rgba(44, 34, 30, 0.12);
+        }
+
+        /* Hero & Carousel Styling */
+        .hero-carousel {
+            height: 85vh;
+            position: relative;
+        }
+
+        .hero-carousel .carousel-item {
+            height: 85vh;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(11, 15, 25, 0.5) 0%, rgba(11, 15, 25, 0.3) 50%, rgba(11, 15, 25, 0.8) 100%);
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.75rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-subtitle {
+            font-family: 'Alex Brush', cursive;
+            font-weight: 400;
+            font-size: 2.25rem;
+            color: var(--brand-accent);
+            text-transform: none; /* Allows natural cursive capitalization instead of forced ALL-CAPS */
+            text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.7);
+            line-height: 1.2;
+        }
+
+        .carousel-control-prev, .carousel-control-next {
+            width: 5%;
+        }
+
+        .carousel-indicators [data-bs-target] {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 6px;
+            margin-right: 6px;
+            background-color: var(--earth-terracotta);
+        }
+
+        .carousel-fade .carousel-item {
+            transition-duration: 0.8s;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-custom px-4">
+        <a class="navbar-brand fw-bold text-uppercase" href="{% url 'index' %}">OFFGRID MAASAI ADVENTURES LTD</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav gap-3 align-items-center">
+                <li class="nav-item"><a class="nav-link active" href="#what-we-do">Our Story</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Our Experiences</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                
+                <li class="nav-item">
+                    <a class="btn btn-light-brown btn-sm fw-bold px-3 ms-2" href="#">
+                        <i class="fa-solid fa-bag-shopping me-1"></i> Shop
+                    </a>
+                </li>
+
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="btn btn-warning btn-sm fw-bold px-3 ms-2" href="{% url 'admin_upload' %}">
+                        <i class="fa-solid fa-cloud-arrow-up me-1"></i> Admin Upload
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
