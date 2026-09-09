@@ -180,22 +180,66 @@
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav gap-3 align-items-center">
-                <li class="nav-item"><a class="nav-link active" href="#our-story">Our Story</a></li>
-                <li class="nav-item"><a class="nav-link" href="#our-experiences">Our Experiences</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'meet_the_tribe' %}">Meet the Tribe</a></li>
-                <li class="nav-item"><a class="nav-link" href="#our-portfolio">Expedition Gallery</a></li>
-                <li class="nav-item"><a class="nav-link" href="#blog">Bush Chronicles</a></li>
-                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'our_story' or request.resolver_match.url_name == 'home' and not request.resolver_match.url_name %}active{% endif %}" 
+                    href="#our-story">
+                        Our Story
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'our_experiences' %}active{% endif %}" 
+                    href="#our-experiences">
+                        Our Experiences
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'meet_the_tribe' %}active{% endif %}" 
+                    href="{% url 'meet_the_tribe' %}">
+                        Meet the Tribe
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'expedition_gallery' %}active{% endif %}" 
+                    href="{% url 'expedition_gallery' %}">
+                        Expedition Gallery
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'blog_list' or request.resolver_match.url_name == 'blog_detail' %}active{% endif %}" 
+                    href="{% url 'blog_list' %}">
+                        Bush Chronicles
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 
+                    href="#contact">
+                        Contact
+                    </a>
+                </li>
                 
                 <li class="nav-item">
-                    <a class="btn btn-light-brown btn-sm fw-bold px-3 ms-2" href="#">
+                    <a class="btn btn-light-brown btn-sm fw-bold px-3 ms-2 {% if request.resolver_match.url_name == 'shop_list' %}active{% endif %}" 
+                    href="{% url 'shop_list' %}">
                         <i class="fa-solid fa-bag-shopping me-1"></i> Shop
                     </a>
                 </li>
 
+                {% if cart_item_count > 0 %}
+                <li class="nav-item">
+                    <a class="btn btn-dark btn-sm fw-bold px-3 ms-2 position-relative" href="{% url 'cart_detail' %}">
+                        <i class="fa-solid fa-cart-shopping me-1"></i> Cart
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ cart_item_count }}
+                            <span class="visually-hidden">items in cart</span>
+                        </span>
+                    </a>
+                </li>
+                {% endif %}
+
                 {% if user.is_superuser %}
                 <li class="nav-item">
-                    <a class="btn btn-warning btn-sm fw-bold px-3 ms-2" href="{% url 'admin_upload' %}">
+                    <a class="btn btn-warning btn-sm fw-bold px-3 ms-2 {% if request.resolver_match.url_name == 'admin_upload' %}active{% endif %}" 
+                    href="{% url 'admin_upload' %}">
                         <i class="fa-solid fa-cloud-arrow-up me-1"></i> Admin Upload
                     </a>
                 </li>

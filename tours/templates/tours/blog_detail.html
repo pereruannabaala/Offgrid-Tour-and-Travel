@@ -1,0 +1,158 @@
+{% extends 'tours/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Include CKEditor 5 default CSS styles for rendered content -->
+<link rel="stylesheet" href="{% static 'django_ckeditor_5/app.css' %}" type="text/css">
+
+<style>
+.article-section {
+  background-color: #F2ECDC;
+  color: #3A2E22;
+  font-family: 'Work Sans', sans-serif;
+  padding: 6rem 1.5rem;
+}
+
+.article-container {
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+.article-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.article-cat {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #B4924F;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.article-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  color: #22301F;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.article-meta {
+  font-size: 0.9rem;
+  color: #8A9A83;
+}
+
+.article-hero-img {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  margin-bottom: 3rem;
+}
+
+/* CKEditor Content Styling */
+.article-body {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #3A2E22;
+}
+
+.article-body p {
+  margin-bottom: 1.8rem;
+}
+
+.article-body h2, 
+.article-body h3, 
+.article-body h4 {
+  font-family: 'Fraunces', serif;
+  color: #22301F;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.25;
+}
+
+.article-body h2 { font-size: 2rem; }
+.article-body h3 { font-size: 1.6rem; }
+
+.article-body ul, 
+.article-body ol {
+  margin-bottom: 1.8rem;
+  padding-left: 2rem;
+}
+
+.article-body li {
+  margin-bottom: 0.5rem;
+}
+
+.article-body blockquote {
+  border-left: 4px solid #B4924F;
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  font-style: italic;
+  color: #3A2E22;
+  opacity: 0.9;
+}
+
+.article-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+}
+
+.article-body figure {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.article-body figure img {
+  margin-bottom: 0.5rem;
+}
+
+.article-body figcaption {
+  font-size: 0.85rem;
+  color: #8A9A83;
+  font-style: italic;
+}
+
+.article-body table {
+  width: 100%;
+  margin-bottom: 2rem;
+  border-collapse: collapse;
+}
+
+.article-body th, 
+.article-body td {
+  padding: 0.75rem;
+  border: 1px solid #dcd5c3;
+}
+</style>
+
+<article class="article-section">
+  <div class="article-container">
+    <header class="article-header">
+      <span class="article-cat">{{ post.category }}</span>
+      <h1 class="article-title">{{ post.title }}</h1>
+      <div class="article-meta">Published on {{ post.created_at|date:"F d, Y" }} &bull; By {{ post.author }}</div>
+    </header>
+  </div>
+
+  {% if post.featured_image %}
+  <div style="max-width: 1000px; margin: 0 auto;">
+    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="article-hero-img">
+  </div>
+  {% endif %}
+
+  <div class="article-container">
+    <div class="article-body ck-content">
+      <!-- Replaced |linebreaks with |safe to support rich text formatting -->
+      {{ post.content|safe }}
+    </div>
+  </div>
+</article>
+
+{% include 'tours/contact.html' %}
+{% endblock %}

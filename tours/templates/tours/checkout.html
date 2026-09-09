@@ -1,0 +1,131 @@
+{% extends 'tours/base.html' %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px;">
+  <h2 class="font-serif mb-4">Guest Checkout</h2>
+
+  <form method="POST">
+    {% csrf_token %}
+    
+    <!-- Delivery Selection -->
+    <div class="card mb-4 p-3 bg-light border-0 shadow-sm">
+      <h5 class="fw-bold mb-3">Delivery Destination</h5>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="delivery_type" id="deliveryHome" value="home" checked onclick="toggleDelivery('home')">
+        <label class="form-check-label" for="deliveryHome">Ship to Home / International</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="delivery_type" id="deliveryHotel" value="hotel" onclick="toggleDelivery('hotel')">
+        <label class="form-check-label" for="deliveryHotel">Ship to Hotel / Airbnb in Kenya</label>
+      </div>
+    </div>
+
+    <!-- Contact & Shipping Information -->
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Full Name *</label>
+        <input type="text" name="full_name" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Email (For Receipt & Tracking) *</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Phone / WhatsApp *</label>
+        <input type="tel" name="phone" class="form-control" placeholder="+254 7XX XXX XXX" required>
+      </div>
+
+      <!-- Hotel Fields (Hidden by default) -->
+      <div id="hotelFields" class="row g-3 d-none mt-1">
+        <div class="col-md-8">
+          <label class="form-label">Hotel / Safari Lodge Name *</label>
+          <input type="text" name="hotel_name" id="hotel_name" class="form-control" placeholder="e.g. Mara Serena Safari Lodge">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Room / Booking #</label>
+          <input type="text" name="room_number" class="form-control" placeholder="e.g. Room 104">
+        </div>
+      </div>
+
+      <!-- Home Address Fields -->
+      <div id="homeFields" class="row g-3 mt-1">
+        <div class="col-12">
+          <label class="form-label">Address / Street *</label>
+          <input type="text" name="address_line_1" id="address_line_1" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">City *</label>
+          <input type="text" name="city" id="city" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Country *</label>
+          <input type="text" name="country" class="form-control" value="Kenya" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Method Selection -->
+    <div class="card mt-4 p-3 border-0 shadow-sm">
+      <h5 class="fw-bold mb-3">Select Payment Method</h5>
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="payment_method" id="payMpesa" value="mpesa" checked>
+        <label class="form-check-label fw-semibold" for="payMpesa">
+          <i class="fa-solid fa-mobile-screen me-2 text-success"></i> M-Pesa STK Push
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment_method" id="payStripe" value="stripe">
+        <label class="form-check-label fw-semibold" for="payStripe">
+          <i class="fa-solid fa-credit-card me-2 text-primary"></i> Credit / Debit Card (Stripe)
+        </label>
+      </div>
+    </div>
+
+    <!-- Gift Option -->
+    <div class="card mt-4 p-3 border-warning bg-light">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="is_gift" id="isGift" onclick="document.getElementById('giftMessageWrap').classList.toggle('d-none')">
+        <label class="form-check-label fw-bold" for="isGift">
+          <i class="fa-solid fa-gift me-1 text-warning"></i> This is a gift (Hide prices on packing receipt)
+        </label>
+      </div>
+      <div id="giftMessageWrap" class="d-none mt-3">
+        <textarea name="gift_message" class="form-control" rows="3" placeholder="Write your gift message here..."></textarea>
+      </div>
+    </div>
+
+    <!-- Complete Order Button -->
+    <button type="submit" class="btn btn-dark btn-lg w-100 mt-4">
+      Complete Order (${{ cart.get_total_price }})
+    </button>
+  </form>
+</div>
+
+<script>
+function toggleDelivery(type) {
+  const hotelFields = document.getElementById('hotelFields');
+  const homeFields = document.getElementById('homeFields');
+  const hotelInput = document.getElementById('hotel_name');
+  const addressInput = document.getElementById('address_line_1');
+  const cityInput = document.getElementById('city');
+
+  if (type === 'hotel') {
+    hotelFields.classList.remove('d-none');
+    homeFields.classList.add('d-none');
+    
+    // Adjust required field rules
+    hotelInput.required = true;
+    addressInput.required = false;
+    cityInput.required = false;
+  } else {
+    hotelFields.classList.add('d-none');
+    homeFields.classList.remove('d-none');
+    
+    // Adjust required field rules
+    hotelInput.required = false;
+    addressInput.required = true;
+    cityInput.required = true;
+  }
+}
+</script>
+{% endblock %}

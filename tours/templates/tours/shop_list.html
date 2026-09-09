@@ -1,0 +1,93 @@
+{% extends 'tours/base.html' %}
+
+{% block content %}
+<style>
+.shop-section {
+  background-color: #F2ECDC;
+  color: #3A2E22;
+  font-family: 'Work Sans', sans-serif;
+  padding: 5rem 1.5rem;
+}
+
+.product-card {
+  background: #FFFFFF;
+  border: 1px solid #E5DEC9;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.product-img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.product-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.35rem;
+  color: #22301F;
+}
+
+.price-tag {
+  color: #B4924F;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+</style>
+
+<section class="shop-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-uppercase tracking-wider text-muted small fw-bold">Authentic Maasai Crafts</span>
+      <h1 class="font-serif display-5 fw-bold text-dark mt-1">Souvenir Shop</h1>
+      <p class="text-muted mx-auto" style="max-width: 600px;">
+        Handcrafted by local artisans. Support the community and take home a piece of Kenya.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      {% for product in products %}
+      <div class="col-md-6 col-lg-4">
+        <div class="product-card h-100 d-flex flex-column">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+          {% else %}
+            <div class="product-img bg-light d-flex align-items-center justify-content-center text-muted">
+              No Image Available
+            </div>
+          {% endif %}
+          
+          <div class="p-4 d-flex flex-column flex-grow-1">
+            <h3 class="product-title mb-2">{{ product.name }}</h3>
+            <div class="text-muted small mb-3 flex-grow-1">
+              {{ product.description|striptags|truncatewords:20 }}
+            </div>
+            
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+              <div>
+                <span class="price-tag">${{ product.price_usd }}</span>
+                <small class="text-muted d-block">KES {{ product.price_kes }}</small>
+              </div>
+              <a href="{% url 'cart_add' product.id %}" class="btn btn-dark btn-sm px-3 fw-bold">
+                <i class="fa-solid fa-cart-plus me-1"></i> Add to Cart
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5">
+        <p class="fs-5 text-muted">No souvenirs available in the shop right now. Check back soon!</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% include 'tours/contact.html' %}
+{% endblock %}

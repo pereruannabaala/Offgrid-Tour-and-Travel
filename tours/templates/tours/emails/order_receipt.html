@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; color: #333; padding: 20px; }
+        .container { max-width: 600px; background: #ffffff; padding: 30px; border-radius: 8px; margin: 0 auto; }
+        .header { border-bottom: 2px solid #28a745; padding-bottom: 15px; margin-bottom: 20px; }
+        .badge-success { background: #28a745; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 12px; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .table th, .table td { border-bottom: 1px solid #ddd; padding: 8px; text-align: left; }
+        .footer { margin-top: 30px; font-size: 12px; color: #777; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Payment Confirmation</h2>
+            <p>Order #{{ order.id }}</p>
+        </div>
+
+        <p>Hi {{ order.full_name }},</p>
+        <p>Thank you for your payment! We have received your payment via M-Pesa and your order is now being processed.</p>
+
+        <div style="background-color: #e9f7ef; padding: 15px; border-radius: 6px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>M-Pesa Receipt Number:</strong> <span style="font-size: 18px; color: #28a745;">{{ order.mpesa_receipt_number }}</span></p>
+            <p style="margin: 5px 0 0 0;"><strong>Amount Paid:</strong> ${{ order.total_amount }}</p>
+        </div>
+
+        <h3>Order Summary</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td style="text-align: center;">{{ item.quantity }}</td>
+                    <td style="text-align: right;">${{ item.get_cost }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p style="margin-top: 20px;">You can track your order status anytime using your tracking link: <br>
+            <a href="{{ tracking_url }}">{{ tracking_url }}</a>
+        </p>
+
+        <div class="footer">
+            <p>If you have any questions, feel free to reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

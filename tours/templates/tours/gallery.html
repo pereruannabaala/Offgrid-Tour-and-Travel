@@ -1,0 +1,418 @@
+{% extends 'tours/base.html' %}
+
+{% block content %}
+
+<!-- Embedded Styles for Expedition Gallery -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Work+Sans:wght@400;500;600&display=swap');
+
+.expedition-gallery {
+  --bush: #22301F;
+  --parchment: #F2ECDC;
+  --umber: #3A2E22;
+  --gold: #B4924F;
+  --sage: #8A9A83;
+  --white: #FFFFFF;
+
+  background: var(--parchment);
+  color: var(--umber);
+  font-family: 'Work Sans', sans-serif;
+  padding: 0 0 6rem;
+}
+
+.expedition-gallery * {
+  box-sizing: border-box;
+}
+
+/* ---------- Hero ---------- */
+
+.eg-hero {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 5.5rem 1.5rem 3rem;
+  text-align: left;
+}
+
+.eg-hero__title {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1.05;
+  margin: 0 0 1rem;
+  color: var(--bush);
+}
+
+.eg-hero__rule {
+  width: 64px;
+  height: 2px;
+  background: var(--gold);
+  border: none;
+  margin: 1.25rem 0;
+}
+
+.eg-hero__dek {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  color: var(--umber);
+  max-width: 46ch;
+}
+
+/* ---------- Filters ---------- */
+
+.eg-filters {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.75rem;
+  border-bottom: 1px solid rgba(58, 46, 34, 0.15);
+}
+
+.eg-filter {
+  background: none;
+  border: none;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 0.95rem;
+  color: var(--umber);
+  opacity: 0.55;
+  cursor: pointer;
+  padding: 0 0 0.6rem;
+  border-bottom: 2px solid transparent;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.eg-filter:hover {
+  opacity: 0.9;
+}
+
+.eg-filter.is-active {
+  opacity: 1;
+  border-bottom-color: var(--gold);
+  color: var(--bush);
+}
+
+/* ---------- Masonry grid ---------- */
+
+.eg-grid {
+  max-width: 1200px;
+  margin: 2.5rem auto 0;
+  padding: 0 1.5rem;
+  column-count: 3;
+  column-gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .eg-grid { column-count: 2; }
+}
+
+@media (max-width: 560px) {
+  .eg-grid { column-count: 1; }
+  .eg-hero { padding-top: 3.5rem; }
+}
+
+.eg-item {
+  break-inside: avoid;
+  margin-bottom: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid rgba(58, 46, 34, 0.12);
+  cursor: pointer;
+}
+
+.eg-item.is-hidden {
+  display: none;
+}
+
+.eg-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.6s ease;
+}
+
+.eg-item:hover img {
+  transform: scale(1.04);
+}
+
+.eg-item__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.5rem 1.1rem 1rem;
+  background: linear-gradient(to top, rgba(34, 48, 31, 0.85), rgba(34, 48, 31, 0));
+  color: var(--parchment);
+  transform: translateY(100%);
+  transition: transform 0.35s ease;
+}
+
+.eg-item:hover .eg-item__caption {
+  transform: translateY(0);
+}
+
+.eg-item__caption-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 0 0 0.15rem;
+}
+
+.eg-item__caption-place {
+  font-size: 0.8rem;
+  color: var(--sage);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Lightbox ---------- */
+
+.eg-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 26, 17, 0.96);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 2rem;
+}
+
+.eg-lightbox.is-open {
+  display: flex;
+}
+
+.eg-lightbox__figure {
+  max-width: 90vw;
+  max-height: 82vh;
+  text-align: center;
+  margin: 0;
+}
+
+.eg-lightbox__figure img {
+  max-width: 90vw;
+  max-height: 74vh;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.eg-lightbox__caption {
+  color: var(--parchment);
+  font-family: 'Work Sans', sans-serif;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  opacity: 0.85;
+}
+
+.eg-lightbox__close,
+.eg-lightbox__prev,
+.eg-lightbox__next {
+  position: absolute;
+  background: none;
+  border: none;
+  color: var(--parchment);
+  cursor: pointer;
+  font-family: 'Work Sans', sans-serif;
+  transition: opacity 0.2s ease;
+}
+
+.eg-lightbox__close {
+  top: 1.75rem;
+  right: 1.75rem;
+  font-size: 1.6rem;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.eg-lightbox__prev,
+.eg-lightbox__next {
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2.2rem;
+  padding: 0.5rem 0.75rem;
+  opacity: 0.6;
+}
+
+.eg-lightbox__prev { left: 0.5rem; }
+.eg-lightbox__next { right: 0.5rem; }
+
+.eg-lightbox__close:hover,
+.eg-lightbox__prev:hover,
+.eg-lightbox__next:hover {
+  opacity: 1;
+}
+
+.eg-lightbox__count {
+  position: absolute;
+  bottom: 1.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--sage);
+  font-size: 0.85rem;
+  font-family: 'Work Sans', sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eg-item img,
+  .eg-item__caption {
+    transition: none;
+  }
+}
+</style>
+
+<!-- Expedition Gallery HTML Structure -->
+<section class="expedition-gallery">
+
+  <div class="eg-hero">
+    <h1 class="eg-hero__title">Expedition Gallery</h1>
+    <hr class="eg-hero__rule">
+    <p class="eg-hero__dek">Moments from the field — the light, the dust, the wildlife, and the camps that make each journey unrepeatable.</p>
+  </div>
+
+  {% if categories %}
+  <div class="eg-filters">
+    <button class="eg-filter is-active" data-category="all">All</button>
+    {% for cat in categories %}
+    <button class="eg-filter" data-category="{{ cat }}">{{ cat }}</button>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="eg-grid">
+    {% for photo in photos %}
+    <figure class="eg-item" data-category="{{ photo.category }}" data-caption="{{ photo.caption }}{% if photo.place %} — {{ photo.place }}{% endif %}">
+      <img
+        src="{% if photo.thumb %}{{ photo.thumb }}{% else %}{{ photo.image }}{% endif %}"
+        data-full="{{ photo.image }}"
+        alt="{{ photo.caption }}"
+        loading="lazy">
+      <figcaption class="eg-item__caption">
+        <p class="eg-item__caption-title">{{ photo.caption }}</p>
+        {% if photo.place %}
+        <p class="eg-item__caption-place">{{ photo.place }}</p>
+        {% endif %}
+      </figcaption>
+    </figure>
+    {% empty %}
+    <p style="padding: 2rem; color: var(--umber);">No expedition photos available yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="eg-lightbox">
+    <button class="eg-lightbox__close" aria-label="Close">&times;</button>
+    <button class="eg-lightbox__prev" aria-label="Previous">&#8249;</button>
+    <figure class="eg-lightbox__figure">
+      <img class="eg-lightbox__img" src="" alt="">
+      <figcaption class="eg-lightbox__caption"></figcaption>
+    </figure>
+    <button class="eg-lightbox__next" aria-label="Next">&#8250;</button>
+    <div class="eg-lightbox__count"></div>
+  </div>
+
+</section>
+
+<!-- Embedded Gallery Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const root = document.querySelector('.expedition-gallery');
+  if (!root) return;
+
+  const items = Array.from(root.querySelectorAll('.eg-item'));
+  const filters = Array.from(root.querySelectorAll('.eg-filter'));
+
+  const lightbox = root.querySelector('.eg-lightbox');
+  const lightboxImg = lightbox.querySelector('.eg-lightbox__img');
+  const lightboxCaption = lightbox.querySelector('.eg-lightbox__caption');
+  const lightboxCount = lightbox.querySelector('.eg-lightbox__count');
+  const closeBtn = lightbox.querySelector('.eg-lightbox__close');
+  const prevBtn = lightbox.querySelector('.eg-lightbox__prev');
+  const nextBtn = lightbox.querySelector('.eg-lightbox__next');
+
+  let visibleItems = items.slice();
+  let currentIndex = 0;
+
+  // ---- Filtering ----
+  function applyFilter(category) {
+    filters.forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.dataset.category === category);
+    });
+
+    items.forEach(function (item) {
+      const match = category === 'all' || item.dataset.category === category;
+      item.classList.toggle('is-hidden', !match);
+    });
+
+    visibleItems = items.filter(function (item) {
+      return category === 'all' || item.dataset.category === category;
+    });
+  }
+
+  filters.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      applyFilter(btn.dataset.category);
+    });
+  });
+
+  // ---- Lightbox ----
+  function openLightbox(item) {
+    visibleItems = items.filter(function (i) {
+      return !i.classList.contains('is-hidden');
+    });
+    currentIndex = visibleItems.indexOf(item);
+    render();
+    lightbox.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  function render() {
+    const item = visibleItems[currentIndex];
+    if (!item) return;
+    const img = item.querySelector('img');
+    lightboxImg.src = img.dataset.full || img.src;
+    lightboxImg.alt = img.alt || '';
+    lightboxCaption.textContent = item.dataset.caption || '';
+    lightboxCount.textContent = (currentIndex + 1) + ' / ' + visibleItems.length;
+  }
+
+  function step(delta) {
+    if (visibleItems.length === 0) return;
+    currentIndex = (currentIndex + delta + visibleItems.length) % visibleItems.length;
+    render();
+  }
+
+  items.forEach(function (item) {
+    item.addEventListener('click', function () {
+      openLightbox(item);
+    });
+  });
+
+  closeBtn.addEventListener('click', closeLightbox);
+  prevBtn.addEventListener('click', function () { step(-1); });
+  nextBtn.addEventListener('click', function () { step(1); });
+
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!lightbox.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'ArrowRight') step(1);
+  });
+});
+</script>
+
+{% include 'tours/contact.html' %}
+{% endblock %}

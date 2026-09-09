@@ -1,0 +1,153 @@
+<!-- tours/templates/tours/contact.html -->
+<section id="contact" class="py-5 text-white" style="background-color: #2c221e; border-top: 1px solid rgba(226, 218, 205, 0.15);">
+    <div class="container py-lg-5">
+        
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <span class="text-terracotta text-uppercase fw-bold letter-spacing-2 small d-block mb-1">Start Your Journey</span>
+            <h2 class="display-4 font-serif text-white fw-normal mb-1">Begin Your Safari Experience</h2>
+            <p class="font-script fs-1 mb-0" style="color: var(--brand-accent);">Let us craft your tailored African adventure</p>
+        </div>
+
+        <div class="row g-5 justify-content-between align-items-center">
+            
+            <!-- Left Column: Contact Details & Office Info -->
+            <div class="col-lg-5">
+                <div class="pe-lg-3">
+                    <h3 class="h2 font-serif text-white mb-2">OFFGrid Maasai Adventures Limited</h3>
+                    <p class="text-terracotta text-uppercase fw-bold small letter-spacing-1 mb-4">Private Safaris • East Africa</p>
+                    
+                    <p class="opacity-85 mb-4" style="line-height: 1.8; color: #e2dacd;">
+                        Whether you are planning a private custom safari, a luxury mobile tented experience, or a family expedition across East Africa, our travel specialists are ready to guide you.
+                    </p>
+
+                    <div class="d-flex flex-column gap-3 mt-4">
+                        <!-- Email -->
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 fs-5" style="color: var(--brand-accent); width: 24px;">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <div>
+                                <a href="mailto:info@offgridmaasai.com" class="text-white text-decoration-none opacity-90">info@offgridmaasai.com</a>
+                            </div>
+                        </div>
+
+                        <!-- Phone / WhatsApp -->
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 fs-5" style="color: var(--brand-accent); width: 24px;">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <a href="tel:+254XXXXXXXXX" class="text-white text-decoration-none opacity-90">+254 XXX XXX XXX</a>
+                            </div>
+                        </div>
+
+                        <!-- Website -->
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 fs-5" style="color: var(--brand-accent); width: 24px;">
+                                <i class="fa-solid fa-globe"></i>
+                            </div>
+                            <div>
+                                <a href="https://www.offgridmaasai.com" target="_blank" class="text-white text-decoration-none opacity-90">www.offgridmaasai.com</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media Links -->
+                    <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                        <h6 class="fw-bold text-uppercase small text-terracotta mb-3">Follow Our Journey</h6>
+                        <div class="d-flex gap-3">
+                            <a href="https://instagram.com/Offgridmaasai" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                                <i class="fa-brands fa-instagram me-1" style="color: var(--brand-accent);"></i> @offgridmaasai
+                            </a>
+                            <a href="https://facebook.com/Offgridmaasai" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                                <i class="fa-brands fa-facebook-f me-1" style="color: var(--brand-accent);"></i> @offgridmaasai
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tagline -->
+                    <div class="mt-4 pt-2">
+                        <p class="font-serif fst-italic text-white opacity-75 mb-0 fs-5">
+                            Explore Wild. Travel Authentically. Travel OFFGrid.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Column: Safari Inquiry Form -->
+            <div class="col-lg-7">
+                <div class="p-4 p-md-5 rounded" style="background-color: rgba(11, 15, 25, 0.4); border: 1px solid rgba(226, 218, 205, 0.15);">
+                    <form action="#" method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            
+                            <!-- Full Name -->
+                            <div class="col-md-6">
+                                <label for="name" class="form-label small text-uppercase fw-bold text-terracotta">Full Name</label>
+                                <input type="text" class="form-control bg-transparent text-white border-secondary" id="name" name="name" placeholder="e.g. Sarah Jenkins" required style="border-color: rgba(226, 218, 205, 0.3) !important;">
+                            </div>
+
+                            <!-- Email Address -->
+                            <div class="col-md-6">
+                                <label for="email" class="form-label small text-uppercase fw-bold text-terracotta">Email Address</label>
+                                <input type="email" class="form-control bg-transparent text-white border-secondary" id="email" name="email" placeholder="name@example.com" required style="border-color: rgba(226, 218, 205, 0.3) !important;">
+                            </div>
+
+                            <!-- Number of Guests -->
+                            <div class="col-md-6">
+                                <label for="travelers" class="form-label small text-uppercase fw-bold text-terracotta">Number of Guests</label>
+                                <input type="number" min="1" step="1" class="form-control bg-transparent text-white border-secondary" id="travelers" name="travelers" placeholder="Enter total guests" required style="border-color: rgba(226, 218, 205, 0.3) !important;">
+                            </div>
+
+                            <!-- Dynamic Experience Selection -->
+                            <div class="col-md-6">
+                                <label for="experience" class="form-label small text-uppercase fw-bold text-terracotta">Select Experience</label>
+                                <select class="form-select bg-transparent text-white border-secondary" id="experience" name="experience" required style="border-color: rgba(226, 218, 205, 0.3) !important;">
+                                    {% for exp in experiences %}
+                                        {% if forloop.first %}
+                                            <option class="text-dark" value="{{ exp.id }}" selected>
+                                                {{ exp.number }} {{ exp.title }}
+                                            </option>
+                                        {% else %}
+                                            <option class="text-dark" value="{{ exp.id }}" disabled>
+                                                {{ exp.number }} {{ exp.title }} (Coming Soon)
+                                            </option>
+                                        {% endif %}
+                                    {% empty %}
+                                        <option class="text-dark" value="safari" selected>01. Wildlife Safari Tour</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Travel Date Range Pickers -->
+                            <div class="col-md-6">
+                                <label for="start_date" class="form-label small text-uppercase fw-bold text-terracotta">Start Date</label>
+                                <input type="date" class="form-control bg-transparent text-white border-secondary" id="start_date" name="start_date" required style="border-color: rgba(226, 218, 205, 0.3) !important; color-scheme: dark;">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="end_date" class="form-label small text-uppercase fw-bold text-terracotta">End Date</label>
+                                <input type="date" class="form-control bg-transparent text-white border-secondary" id="end_date" name="end_date" required style="border-color: rgba(226, 218, 205, 0.3) !important; color-scheme: dark;">
+                            </div>
+
+                            <!-- Details / Custom Notes -->
+                            <div class="col-12">
+                                <label for="message" class="form-label small text-uppercase fw-bold text-terracotta">Tell Us About Your Ideal Trip</label>
+                                <textarea class="form-control bg-transparent text-white border-secondary" id="message" name="message" rows="3" placeholder="Mention preferred parks, special occasions, or custom requirements..." style="border-color: rgba(226, 218, 205, 0.3) !important;"></textarea>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-light-brown btn-lg w-100 py-3 fw-bold text-uppercase">
+                                    Send Safari Inquiry
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
