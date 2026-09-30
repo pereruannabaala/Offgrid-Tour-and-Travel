@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(help_text='e.g. Tour & Travel', max_length=200)),
-                ('subtitle', models.CharField(blank=True, help_text='e.g. Offgrid Maasai Adventures Ltd', max_length=200)),
+                ('subtitle', models.CharField(blank=True, help_text='e.g. Kaelo Maasai Adventures Ltd', max_length=200)),
                 ('image', models.ImageField(upload_to='hero_slides/')),
                 ('category', models.CharField(choices=[('hero', 'Hero Slider'), ('what_we_do', 'What We Do'), ('services', 'Our Services'), ('gallery', 'Gallery Grid')], default='hero', max_length=50)),
                 ('is_active', models.BooleanField(default=True)),

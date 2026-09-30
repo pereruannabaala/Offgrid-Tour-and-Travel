@@ -7,20 +7,22 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from .cart import Cart
+from .mpesa import trigger_stk_push
+from .models import SafariInquiry, Product, ProductVariant
 
 from .models import (
     HeroSlide, WhatWeDoContent, Experience, TeamMember, 
     PageHeader, ExpeditionPhoto, BlogPost, BlogHeader, 
-    Product, Order, OrderItem
+    Product, Order, OrderItem, ProductVariant
 )
-from .cart import Cart
-from .mpesa import trigger_stk_push
+
 
 
 def format_phone_number(phone):
     """
     Normalizes Kenyan phone numbers to standard Safaricom format: 2547XXXXXXXX or 2541XXXXXXXX
-    Handles: '0712345678', '+254712345678', '254712345678', '0112345678'
     """
     cleaned = re.sub(r'\D', '', str(phone))  # Strip non-digit characters
     
@@ -86,7 +88,9 @@ def admin_upload_image(request):
 
 def meet_the_tribe(request):
     team_members = TeamMember.objects.all().order_by('order')
-    header = PageHeader.objects.filter(page_name='meet_the_tribe').first()
+    
+    # Try fetching by page_name; fallback to first header if not found
+    header = PageHeader.objects.filter(page_name='meet_the_tribe').first() or PageHeader.objects.first()
     
     return render(request, 'tours/meet_the_tribe.html', {
         'team_members': team_members,
@@ -136,35 +140,80 @@ def blog_detail(request, slug):
 
 
 def shop_list(request):
-    products = Product.objects.filter(is_active=True)
+    products = Product.objects.all()
     return render(request, 'tours/shop_list.html', {'products': products})
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    return render(request, 'tours/product_detail.html', {'product': product})
+
 
 
 def cart_add(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
-    cart.add(product=product)
-    return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
+    
+    variant = None
+    variant_id = request.POST.get('variant_id')
+    
+    if variant_id and variant_id != 'None':
+        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+        available_stock = variant.stock
+    else:
+        # If product has variants, a variant MUST be selected
+        if product.variants.exists() and not variant:
+            # Redirect back with a message or to the detail page if no variant was chosen
+            return redirect('product_detail', product_id=product.id)
+        available_stock = product.stock
 
+    # Check stock validation before adding
+    if available_stock <= 0:
+        return redirect('product_detail', product_id=product.id)
 
-def cart_remove_single(request, product_id):
-    cart = Cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    cart.remove_single(product)
+    cart.add(product=product, variant=variant, quantity=1)
     return redirect('cart_detail')
-
-
+    
 def cart_remove(request, product_id):
     cart = Cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    cart.remove(product)
+    variant_id = request.GET.get('variant_id') or None
+    if variant_id == 'None':
+        variant_id = None
+    cart.remove(product_id=product_id, variant_id=variant_id)
     return redirect('cart_detail')
-
 
 def cart_detail(request):
     cart = Cart(request)
     return render(request, 'tours/cart_detail.html', {'cart': cart})
 
+def cart_update(request, product_id):
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    
+    variant_id = request.POST.get('variant_id') or request.GET.get('variant_id')
+    if variant_id == 'None':
+        variant_id = None
+        
+    variant = None
+    if variant_id:
+        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+
+    action = request.POST.get('action') or request.GET.get('action')
+    
+    # Determine current quantity in cart
+    cart_key = f"{product_id}_{variant_id}"
+    current_qty = cart.cart.get(cart_key, {}).get('quantity', 1)
+
+    if action == 'increase':
+        max_stock = variant.stock if variant else product.stock
+        if current_qty < max_stock:
+            cart.add(product=product, variant=variant, quantity=1)
+    elif action == 'decrease':
+        if current_qty > 1:
+            cart.add(product=product, variant=variant, quantity=-1)
+        else:
+            cart.remove(product_id=product_id, variant_id=variant_id)
+
+    return redirect('cart_detail')
 
 def guest_checkout(request):
     cart = Cart(request)
@@ -200,15 +249,27 @@ def guest_checkout(request):
         )
 
         # 2. Save Order Items
+
+        # 2. Save Order Items and Reduce Stock
         for item in cart:
+            # Depending on how your Cart helper handles item objects or dictionaries:
+            prod = item.get('product')
+            qty = item.get('quantity', 1)
+            
+            # If using session cart dictionary keys:
+            # (Adjust based on how your cart items are accessed)
+            if hasattr(prod, 'stock'):
+                prod.stock = max(0, prod.stock - qty)
+                prod.save()
+
             OrderItem.objects.create(
                 order=order,
-                product=item['product'],
+                product=prod,
                 price=item['price'],
-                quantity=item['quantity']
+                quantity=qty
             )
-
         # 3. Send Confirmation Email
+        
         tracking_url = request.build_absolute_uri(
             reverse('guest_order_tracking', kwargs={'token': order.tracking_token})
         )
@@ -338,3 +399,59 @@ def retry_mpesa_payment(request, token):
             messages.error(request, f"STK Push failed: {error_msg}")
 
     return redirect('guest_order_tracking', token=order.tracking_token)
+
+
+def safari_inquiry_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        travelers = request.POST.get('travelers')
+        experience = request.POST.get('experience')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        user_message = request.POST.get('message')
+
+        # 1. Save inquiry to the database
+        try:
+            inquiry = SafariInquiry.objects.create(
+                name=name,
+                email=email,
+                travelers=travelers,
+                experience=experience,
+                start_date=start_date,
+                end_date=end_date,
+                message=user_message
+            )
+        except Exception as e:
+            messages.error(request, "There was an error saving your request. Please check your inputs.")
+            return redirect('/#contact')
+
+        # 2. Compose and send email to kaeloexpeditions@gmail.com
+        subject = f"New Safari Inquiry from {name} - Kaelo Expeditions"
+        body = (
+            f"You have received a new safari inquiry from your website contact form.\n\n"
+            f"--- Contact Details ---\n"
+            f"Name: {name}\n"
+            f"Email: {email}\n"
+            f"Number of Guests: {travelers}\n"
+            f"Experience ID/Title: {experience}\n"
+            f"Start Date: {start_date}\n"
+            f"End Date: {end_date}\n\n"
+            f"--- Trip Notes ---\n"
+            f"{user_message}\n"
+        )
+
+        try:
+            send_mail(
+                subject=subject,
+                message=body,
+                from_email=None,  # Defaults to DEFAULT_FROM_EMAIL
+                recipient_list=['kaeloexpeditions@gmail.com'],
+                fail_silently=False,
+            )
+            messages.success(request, "Your safari inquiry has been successfully sent! We will get back to you shortly.")
+        except Exception as e:
+            messages.warning(request, "Your inquiry was saved, but we encountered an issue sending the email notification. We will still review it shortly.")
+
+    return redirect('/#contact')
+

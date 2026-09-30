@@ -22,10 +22,27 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
-.product-img {
+/* Container to show the full image without cropping */
+.product-img-container {
   width: 100%;
   height: 260px;
-  object-fit: cover;
+  background-color: #FAF8F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.product-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Keeps the entire image visible in full without cutting edges */
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-img {
+  transform: scale(1.03);
 }
 
 .product-title {
@@ -39,11 +56,27 @@
   font-weight: 700;
   font-size: 1.2rem;
 }
+
+/* Out of Stock Image Overlay Badge */
+.out-of-stock-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: rgba(180, 76, 76, 0.9);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 </style>
 
 <section class="shop-section">
   <div class="container">
     <div class="text-center mb-5">
+      <br>
       <span class="text-uppercase tracking-wider text-muted small fw-bold">Authentic Maasai Crafts</span>
       <h1 class="font-serif display-5 fw-bold text-dark mt-1">Souvenir Shop</h1>
       <p class="text-muted mx-auto" style="max-width: 600px;">
@@ -55,29 +88,55 @@
       {% for product in products %}
       <div class="col-md-6 col-lg-4">
         <div class="product-card h-100 d-flex flex-column">
-          {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
-          {% else %}
-            <div class="product-img bg-light d-flex align-items-center justify-content-center text-muted">
-              No Image Available
-            </div>
-          {% endif %}
+          
+          <!-- Clickable Full image container -->
+          <a href="{% url 'product_detail' product.id %}" class="product-img-container text-decoration-none">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+            {% else %}
+              <span class="text-muted small">No Image Available</span>
+            {% endif %}
+
+            <!-- Out of Stock Badge Overlay -->
+            {% if not product.is_in_stock %}
+              <span class="out-of-stock-badge">Out of Stock</span>
+            {% endif %}
+          </a>
           
           <div class="p-4 d-flex flex-column flex-grow-1">
-            <h3 class="product-title mb-2">{{ product.name }}</h3>
-            <div class="text-muted small mb-3 flex-grow-1">
-              {{ product.description|striptags|truncatewords:20 }}
-            </div>
+            <h3 class="product-title mb-3">
+              <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
+                {{ product.name }}
+              </a>
+            </h3>
             
-            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+            <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
               <div>
                 <span class="price-tag">${{ product.price_usd }}</span>
                 <small class="text-muted d-block">KES {{ product.price_kes }}</small>
               </div>
-              <a href="{% url 'cart_add' product.id %}" class="btn btn-dark btn-sm px-3 fw-bold">
-                <i class="fa-solid fa-cart-plus me-1"></i> Add to Cart
-              </a>
+              
+              <!-- Conditional actions based on stock availability -->
+              {% if product.is_in_stock %}
+                {% if product.variants.all %}
+                  <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-dark btn-sm px-3 fw-bold">
+                    View Options <i class="fa-solid fa-arrow-right ms-1"></i>
+                  </a>
+                {% else %}
+                  <form action="{% url 'cart_add' product.id %}" method="POST" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-dark btn-sm px-3 fw-bold">
+                      <i class="fa-solid fa-cart-plus me-1"></i> Add to Cart
+                    </button>
+                  </form>
+                {% endif %}
+              {% else %}
+                <button class="btn btn-secondary btn-sm px-3 fw-bold" disabled>
+                  Sold Out
+                </button>
+              {% endif %}
             </div>
+
           </div>
         </div>
       </div>
@@ -89,5 +148,6 @@
     </div>
   </div>
 </section>
+
 {% include 'tours/contact.html' %}
 {% endblock %}

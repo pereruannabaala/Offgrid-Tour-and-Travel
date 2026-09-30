@@ -6,7 +6,7 @@ from django.db import models
 
 class HeroSlide(models.Model):
     title = models.CharField(max_length=200, help_text="e.g. Tour & Travel")
-    subtitle = models.CharField(max_length=200, blank=True, help_text="e.g. Offgrid Maasai Adventures Ltd")
+    subtitle = models.CharField(max_length=200, blank=True, help_text="e.g. Kaelo Maasai Adventures Ltd")
     image = models.ImageField(upload_to='hero_slides/')
     category = models.CharField(max_length=50, choices=[
         ('hero', 'Hero Slider'),
@@ -119,18 +119,43 @@ class BlogPost(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
-    description = CKEditor5Field('Description', config_name='default')
-    price_usd = models.DecimalField(max_digits=10, decimal_places=2, help_text="Base price in USD")
-    price_kes = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price in KES")
-    image = models.ImageField(upload_to="shop/products/")
-    stock = models.PositiveIntegerField(default=10)
-    is_active = models.BooleanField(default=True)
+    name = models.CharField(max_length=200)
+    price_usd = models.DecimalField(max_digits=10, decimal_places=2)
+    price_kes = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    stock = models.PositiveIntegerField(default=10) # Base product stock
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_in_stock(self):
+        if self.variants.exists():
+            return any(v.stock > 0 for v in self.variants.all())
+        return self.stock > 0
 
     def __str__(self):
         return self.name
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
+    name = models.CharField(max_length=100) # e.g., "Mini Zebra", "Mid Zebra", "Large Zebra"
+    price_usd = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    price_kes = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    image = models.ImageField(upload_to='variants/', blank=True, null=True) # Variant-specific image
+    stock = models.PositiveIntegerField(default=10) # Variant stock level
+
+    def get_price_usd(self):
+        return self.price_usd if self.price_usd else self.product.price_usd
+
+    def get_price_kes(self):
+        return self.price_kes if self.price_kes else self.product.price_kes
+
+    def __str__(self):
+        return f"{self.product.name} - {self.name}"
+
+class Order(models.Model):
+    # ... (keep all your fields up to __str__)
+
+    def __str__(self):
+        return f"Order #{self.id} - {self.full_name} ({self.email})" 
 
 class Order(models.Model):
     DELIVERY_TYPE_CHOICES = [
@@ -199,3 +224,21 @@ class OrderItem(models.Model):
 
     def get_total(self):
         return self.price * self.quantity
+
+
+class SafariInquiry(models.Model):
+    name = models.CharField(max_length=150)
+    email = models.EmailField()
+    travelers = models.PositiveIntegerField()
+    experience = models.CharField(max_length=100)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    message = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Safari Inquiries"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Inquiry from {self.name} ({self.start_date} to {self.end_date})"

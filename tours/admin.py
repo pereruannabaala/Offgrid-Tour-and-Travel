@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import HeroSlide,WhatWeDoContent,TeamMember, Experience, PageHeader,ExpeditionPhoto, BlogPost, BlogHeader,Product, Order, OrderItem
+from .models import (
+    HeroSlide, WhatWeDoContent, TeamMember, Experience, 
+    PageHeader, ExpeditionPhoto, BlogPost, BlogHeader, 
+    Product, ProductVariant, Order, OrderItem, SafariInquiry
+)
 
 
 @admin.register(HeroSlide)
@@ -20,18 +24,12 @@ class HeroSlideAdmin(admin.ModelAdmin):
 class WhatWeDoAdmin(admin.ModelAdmin):
     list_display = ('title', 'subtitle', 'updated_at')
 
+
 @admin.register(Experience)
 class ExperienceAdmin(admin.ModelAdmin):
-    # Columns displayed in the admin list view
     list_display = ('number', 'title', 'order', 'is_featured')
-    
-    # Enable quick editing directly from the list view
     list_editable = ('order', 'is_featured')
-    
-    # Add search capability
     search_fields = ('title', 'description')
-    
-    # Default ordering in the admin list
     ordering = ('order',)
 
 
@@ -40,19 +38,17 @@ class TeamMemberAdmin(admin.ModelAdmin):
     list_display = ('name', 'role', 'order', 'created_at')
     list_editable = ('order',)
 
+
 @admin.register(PageHeader)
 class PageHeaderAdmin(admin.ModelAdmin):
     list_display = ('page_name', 'title')
 
+
 @admin.register(ExpeditionPhoto)
 class ExpeditionPhotoAdmin(admin.ModelAdmin):
-    # Controls which columns appear in the admin list table view
     list_display = ('image_preview',)
-
-    # Explicitly define ONLY the fields you want to show on the edit form
     fields = ('image', 'thumb')
 
-    # Optional: If you want to show an image thumbnail in the list view
     def image_preview(self, obj):
         if obj.image:
             return f'<img src="{obj.image.url}" style="max-height: 50px;"/>'
@@ -68,24 +64,30 @@ class BlogPostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'excerpt', 'content')
     prepopulated_fields = {'slug': ('title',)}
 
+
 @admin.register(BlogHeader)
 class BlogHeaderAdmin(admin.ModelAdmin):
     pass
 
 
-class OrderItemInline(admin.TabularInline):
-    model = OrderItem
-    extra = 0
 
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'full_name', 'email', 'delivery_type', 'total_amount', 'payment_status', 'order_status', 'created_at']
-    list_filter = ['delivery_type', 'payment_status', 'order_status', 'is_gift']
-    search_fields = ['full_name', 'email', 'tracking_token', 'hotel_name']
-    inlines = [OrderItemInline]
-    readonly_fields = ['tracking_token']
+# --- NEW: Product Variant Inline ---
+class ProductVariantInline(admin.TabularInline):
+    model = ProductVariant
+    extra = 1  # Shows 1 empty row by default for quick adding
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price_usd', 'price_kes', 'stock', 'is_active']
-    prepopulated_fields = {'slug': ('name',)}
+    list_display = ('name', 'price_usd', 'price_kes', 'created_at')
+    search_fields = ('name',)
+    exclude = ('description',)
+    inlines = [ProductVariantInline]  # <-- This links the variants to the Product page!
+
+
+@admin.register(SafariInquiry)
+class SafariInquiryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'travelers', 'experience', 'start_date', 'created_at')
+    list_filter = ('created_at', 'start_date')
+    search_fields = ('name', 'email', 'message')
+    readonly_fields = ('created_at',)

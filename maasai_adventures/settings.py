@@ -97,9 +97,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media Files
 MEDIA_URL = '/media/'
@@ -125,3 +122,27 @@ CKEDITOR_5_CONFIGS = {
         },
     }
 }
+
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'kaeloexpeditions@gmail.com'
+# It is best practice to load this from your .env file: env('EMAIL_HOST_USER_PASSWORD')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_USER_PASSWORD', default='your-gmail-app-password')
+DEFAULT_FROM_EMAIL = 'kaeloexpeditions@gmail.com'
+
+#Cart session identifier
+# Cart Session ID
+CART_SESSION_ID = 'cart'
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = 'static/'
+
+# Optional: If you keep static files inside a global folder, ensure it exists, 
+# or comment out STATICFILES_DIRS if you are only using app-level static folders (e.g., tours/static/).
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',
+# ]

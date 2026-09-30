@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OFFGRID MAASAI ADVENTURES LTD</title>
+    <title>Kaelo Expeditions LTD</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts: Playfair Display, Lato & Alex Brush -->
@@ -48,30 +49,56 @@
         }
 
         .navbar-custom {
-            background: rgba(11, 15, 25, 0.7);
+            background: rgba(11, 15, 25, 0.85);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(226, 218, 205, 0.1);
             padding-top: 1rem;
             padding-bottom: 1rem;
+            transition: background-color 0.4s ease, padding 0.4s ease;
         }
 
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            letter-spacing: 1.5px;
-            font-size: 1.25rem;
+        /* Seamless Logo Background Integration */
+        .navbar-brand img {
+            background-color: #0b0f19; /* Matches base.html background */
+            object-fit: contain;
+            mix-blend-mode: luminosity; /* Pulls tones cleanly into the dark theme */
+            filter: brightness(1.1) contrast(1.1);
+            opacity: 0.95;
+            transition: opacity 0.3s ease;
+        }
+        .navbar-brand img:hover {
+            opacity: 1;
         }
 
         .nav-link {
             font-family: 'Lato', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.85) !important;
+            color: rgba(255, 255, 255, 0.75) !important;
             transition: color 0.3s ease;
+            position: relative;
         }
 
         .nav-link:hover, .nav-link.active {
-            color: var(--brand-accent) !important;
+            color: #ffffff !important;
+        }
+
+        /* Subtle luxury underline effect on active or hovered links */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--brand-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
         }
 
         .btn-light-brown {
@@ -81,7 +108,7 @@
             font-family: 'Lato', sans-serif;
             letter-spacing: 1px;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             transition: background-color 0.2s ease-in-out;
         }
 
@@ -147,7 +174,7 @@
             font-weight: 400;
             font-size: 2.25rem;
             color: var(--brand-accent);
-            text-transform: none; /* Allows natural cursive capitalization instead of forced ALL-CAPS */
+            text-transform: none; 
             text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.7);
             line-height: 1.2;
         }
@@ -173,78 +200,84 @@
 <body>
 
     <!-- Header Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-custom px-4">
-        <a class="navbar-brand fw-bold text-uppercase" href="{% url 'index' %}">OFFGRID MAASAI ADVENTURES LTD</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <ul class="navbar-nav gap-3 align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'our_story' or request.resolver_match.url_name == 'home' and not request.resolver_match.url_name %}active{% endif %}" 
-                    href="#our-story">
-                        Our Story
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'our_experiences' %}active{% endif %}" 
-                    href="#our-experiences">
-                        Our Experiences
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'meet_the_tribe' %}active{% endif %}" 
-                    href="{% url 'meet_the_tribe' %}">
-                        Meet the Tribe
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'expedition_gallery' %}active{% endif %}" 
-                    href="{% url 'expedition_gallery' %}">
-                        Expedition Gallery
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'blog_list' or request.resolver_match.url_name == 'blog_detail' %}active{% endif %}" 
-                    href="{% url 'blog_list' %}">
-                        Bush Chronicles
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 
-                    href="#contact">
-                        Contact
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="btn btn-light-brown btn-sm fw-bold px-3 ms-2 {% if request.resolver_match.url_name == 'shop_list' %}active{% endif %}" 
-                    href="{% url 'shop_list' %}">
-                        <i class="fa-solid fa-bag-shopping me-1"></i> Shop
-                    </a>
-                </li>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-custom px-lg-5 px-3">
+        <div class="container-fluid px-0">
+            <!-- Standalone Logo Brand -->
+            <a class="navbar-brand d-flex align-items-center text-decoration-none" href="{% url 'index' %}">
+                <img src="{% static 'images/logo.jpeg' %}" alt="Kaelo Expeditions Logo" height="40" class="d-inline-block align-text-top rounded">
+            </a>
 
-                {% if cart_item_count > 0 %}
-                <li class="nav-item">
-                    <a class="btn btn-dark btn-sm fw-bold px-3 ms-2 position-relative" href="{% url 'cart_detail' %}">
-                        <i class="fa-solid fa-cart-shopping me-1"></i> Cart
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            {{ cart_item_count }}
-                            <span class="visually-hidden">items in cart</span>
-                        </span>
-                    </a>
-                </li>
-                {% endif %}
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                {% if user.is_superuser %}
-                <li class="nav-item">
-                    <a class="btn btn-warning btn-sm fw-bold px-3 ms-2 {% if request.resolver_match.url_name == 'admin_upload' %}active{% endif %}" 
-                    href="{% url 'admin_upload' %}">
-                        <i class="fa-solid fa-cloud-arrow-up me-1"></i> Admin Upload
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-lg-center gap-lg-3 my-3 my-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'our_story' or request.resolver_match.url_name == 'home' and not request.resolver_match.url_name %}active{% endif %}" 
+                        href="#our-story">
+                            Our Story
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'our_experiences' %}active{% endif %}" 
+                        href="#our-experiences">
+                            Experiences
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'meet_the_tribe' %}active{% endif %}" 
+                        href="{% url 'meet_the_tribe' %}">
+                            The Tribe
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'expedition_gallery' %}active{% endif %}" 
+                        href="{% url 'expedition_gallery' %}">
+                            Gallery
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'blog_list' or request.resolver_match.url_name == 'blog_detail' %}active{% endif %}" 
+                        href="{% url 'blog_list' %}">
+                            Chronicles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 
+                        href="#contact">
+                            Contact
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-light-brown btn-sm rounded-pill px-3 py-2 fw-bold {% if request.resolver_match.url_name == 'shop_list' %}active{% endif %}" 
+                        href="{% url 'shop_list' %}">
+                            <i class="fa-solid fa-bag-shopping me-1"></i> Shop
+                        </a>
+                    </li>
+
+                    {% if cart_item_count > 0 %}
+                    <li class="nav-item">
+                        <a class="btn btn-dark btn-sm rounded-pill px-3 py-2 fw-bold position-relative border border-secondary border-opacity-50" href="{% url 'cart_detail' %}">
+                            <i class="fa-solid fa-cart-shopping me-1"></i> Cart
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                {{ cart_item_count }}
+                            </span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="btn btn-warning btn-sm rounded-pill px-3 py-2 fw-bold {% if request.resolver_match.url_name == 'admin_upload' %}active{% endif %}" 
+                        href="{% url 'admin_upload' %}">
+                            <i class="fa-solid fa-cloud-arrow-up me-1"></i> Admin
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </nav>
 

@@ -1,0 +1,227 @@
+{% extends 'tours/base.html' %}
+
+{% block content %}
+<style>
+.product-detail-section {
+  background-color: #F2ECDC;
+  color: #3A2E22;
+  font-family: 'Work Sans', sans-serif;
+  padding: 5rem 1.5rem;
+  min-height: 80vh;
+}
+
+.detail-card {
+  background: #FFFFFF;
+  border: 1px solid #E5DEC9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.detail-img-container {
+  width: 100%;
+  height: 400px;
+  background-color: #FAF8F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.detail-img-container:hover::after {
+  content: "🔍 Click to Zoom";
+  position: absolute;
+  bottom: 10px;
+  background: rgba(34, 48, 31, 0.8);
+  color: #fff;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.detail-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.product-title {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  color: #22301F;
+}
+
+.price-tag {
+  color: #B4924F;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+/* Version/Variant Selection Cards */
+.variant-option-card {
+  border: 1px solid #E5DEC9;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #FAF8F5;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.variant-option-card:hover {
+  border-color: #B4924F;
+  background-color: #FFFFFF;
+}
+
+.variant-radio:checked + label .variant-option-card {
+  border-color: #22301F;
+  background-color: #22301F;
+  color: #FFFFFF;
+}
+
+.variant-radio:checked + label .variant-option-card .text-muted {
+  color: #D1C7B7 !important;
+}
+
+/* Variant thumbnail hover effect */
+.variant-thumb {
+  width: 50px; 
+  height: 50px; 
+  object-fit: contain; 
+  border-radius: 4px; 
+  background: #fff;
+  border: 1px solid #E5DEC9;
+  transition: transform 0.2s;
+}
+.variant-thumb:hover {
+  transform: scale(1.1);
+}
+</style>
+
+<br>
+<section class="product-detail-section">
+  <div class="container">
+    <div class="mb-4">
+      <a href="{% url 'shop_list' %}" class="text-decoration-none text-dark fw-bold">
+        <i class="fa-solid fa-arrow-left me-2"></i> Back to Shop
+      </a>
+    </div>
+
+    <div class="row g-5 align-items-center detail-card p-4 p-lg-5">
+      <!-- Product Image Column (Clickable to Zoom Modal) -->
+      <div class="col-lg-6">
+        <div class="detail-img-container rounded" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImageModal('{{ product.image.url }}', '{{ product.name }}')">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="detail-img" id="mainProductImg">
+          {% else %}
+            <span class="text-muted">No Image Available</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Product Info & Versions Column -->
+      <div class="col-lg-6">
+        <h1 class="product-title mb-3">{{ product.name }}</h1>
+        
+        <div class="mb-4">
+          <span class="price-tag">${{ product.price_usd }}</span>
+          <span class="text-muted fs-6 ms-2">(Base Price / KES {{ product.price_kes }})</span>
+        </div>
+
+        <form action="{% url 'cart_add' product.id %}" method="POST" id="add-to-cart-form">
+          {% csrf_token %}
+
+          {% if product.variants.all %}
+          <div class="mb-4">
+            <label class="form-label fw-bold text-dark mb-3">Available Sizes / Versions:</label>
+            <div class="d-flex flex-column gap-3">
+              {% for variant in product.variants.all %}
+              <div>
+                <input type="radio" id="variant-{{ variant.id }}" name="variant_id" value="{{ variant.id }}" class="d-none variant-radio" {% if variant.stock <= 0 %}disabled{% endif %}>
+                
+                <label for="variant-{{ variant.id }}" class="d-block w-100 {% if variant.stock <= 0 %}opacity-50 cursor-not-allowed{% endif %}">
+                  <div class="variant-option-card d-flex justify-content-between align-items-center" id="card-{{ variant.id }}">
+                    <div class="d-flex align-items-center gap-3">
+                      {% if variant.image %}
+                        <span role="button" class="d-inline-block" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="event.preventDefault(); event.stopPropagation(); showImageModal('{{ variant.image.url }}', '{{ product.name }} - {{ variant.name }}');">
+                          <img src="{{ variant.image.url }}" alt="{{ variant.name }}" class="variant-thumb" title="Click to view full image">
+                        </span>
+                      {% endif %}
+                      <div>
+                        <h5 class="fw-bold mb-0">{{ variant.name }}</h5>
+                        {% if variant.stock > 0 %}
+                          <small class="text-muted">In Stock ({{ variant.stock }} left)</small>
+                        {% else %}
+                          <small class="text-danger fw-bold">Out of Stock</small>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <span class="fw-bold text-dark">${{ variant.get_price_usd }}</span>
+                      <small class="text-muted d-block">KES {{ variant.get_price_kes }}</small>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold py-3">
+            <i class="fa-solid fa-cart-plus me-2"></i> Add Selected Version to Cart
+          </button>
+          
+          {% else %}
+            <!-- Base product has no variants, add directly -->
+            {% if product.stock > 0 %}
+              <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold py-3">
+                <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
+              </button>
+            {% else %}
+              <button type="button" class="btn btn-secondary btn-lg w-100 fw-bold py-3" disabled>
+                Out of Stock
+              </button>
+            {% endif %}
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Image Lightbox Modal Popup -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark border-0">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title text-light font-serif" id="modalImageTitle">Product View</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center p-4">
+        <img src="" id="modalImageElement" class="img-fluid rounded" style="max-height: 75vh; object-fit: contain;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showImageModal(url, title) {
+  document.getElementById('modalImageElement').src = url;
+  document.getElementById('modalImageTitle').innerText = title;
+}
+
+document.getElementById('add-to-cart-form')?.addEventListener('submit', function(e) {
+    const variants = document.querySelectorAll('input[name="variant_id"]');
+    if (variants.length > 0) {
+        const selected = Array.from(variants).some(radio => radio.checked);
+        if (!selected) {
+            e.preventDefault();
+            alert('Please select a variant/version before adding to cart.');
+        }
+    }
+});
+</script>
+
+{% include 'tours/contact.html' %}
+{% endblock %}

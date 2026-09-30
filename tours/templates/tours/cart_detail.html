@@ -1,87 +1,90 @@
 {% extends 'tours/base.html' %}
 
 {% block content %}
-<section class="py-5" style="background-color: #F2ECDC; min-height: 80vh;">
-  <div class="container" style="max-width: 950px;">
-    <h2 class="font-serif mb-4 text-dark">Your Shopping Cart</h2>
-
-    {% if cart_item_count > 0 %}
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-          <div class="table-responsive">
-            <table class="table align-middle">
-              <thead class="table-light">
-                <tr>
-                  <th scope="col">Product</th>
-                  <th scope="col">Price</th>
-                  <th scope="col" class="text-center" style="width: 160px;">Quantity</th>
-                  <th scope="col" class="text-end">Total</th>
-                  <th scope="col" class="text-center" style="width: 60px;">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in cart %}
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      {% if item.product.image %}
-                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
-                      {% endif %}
-                      <div>
-                        <h6 class="mb-0 font-serif fw-bold text-dark">{{ item.product.name }}</h6>
-                        <small class="text-muted">Item #{{ item.product.id }}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>${{ item.price }}</td>
-                  <td>
-                    <!-- Quantity Adjustment Controls -->
-                    <div class="d-flex align-items-center justify-content-center">
-                      <a href="{% url 'cart_remove_single' item.product.id %}" class="btn btn-outline-dark btn-sm px-2 py-0 border-secondary">
-                        <i class="fa-solid fa-minus" style="font-size: 0.75rem;"></i>
-                      </a>
-                      <span class="fw-bold mx-3 fs-6">{{ item.quantity }}</span>
-                      <a href="{% url 'cart_add' item.product.id %}" class="btn btn-outline-dark btn-sm px-2 py-0 border-secondary">
-                        <i class="fa-solid fa-plus" style="font-size: 0.75rem;"></i>
-                      </a>
-                    </div>
-                  </td>
-                  <td class="text-end fw-bold">${{ item.total_price }}</td>
-                  <td class="text-center">
-                    <!-- Complete Item Removal Button -->
-                    <a href="{% url 'cart_remove' item.product.id %}" class="btn btn-link text-danger p-0" title="Remove item">
-                      <i class="fa-solid fa-trash-can"></i>
-                    </a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-
-          <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-3">
-            <a href="{% url 'shop_list' %}" class="btn btn-outline-dark btn-sm">
-              <i class="fa-solid fa-arrow-left me-1"></i> Continue Shopping
-            </a>
-            <div class="text-end">
-              <h4 class="fw-bold mb-3">Total: ${{ cart.get_total_price }}</h4>
-              <a href="{% url 'guest_checkout' %}" class="btn btn-dark btn-lg px-4">
-                Proceed to Guest Checkout <i class="fa-solid fa-arrow-right ms-1"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% else %}
-      <div class="card border-0 shadow-sm p-5 text-center">
-        <i class="fa-solid fa-bag-shopping fa-3x text-muted mb-3"></i>
-        <h4>Your cart is empty</h4>
-        <p class="text-muted">Explore our authentic Maasai handcrafted souvenirs and add items to your cart.</p>
-        <div>
-          <a href="{% url 'shop_list' %}" class="btn btn-dark mt-2">Browse Souvenirs</a>
-        </div>
-      </div>
-    {% endif %}
+<div class="container py-5" style="font-family: 'Work Sans', sans-serif; min-height: 70vh;">
+  <div class="mb-4">
+    <a href="{% url 'shop_list' %}" class="text-decoration-none text-dark fw-bold">
+      <i class="fa-solid fa-arrow-left me-2"></i> Continue Shopping
+    </a>
   </div>
-</section>
+
+  <h2 class="font-serif fw-bold text-dark mb-4">Your Shopping Cart</h2>
+
+  {% if cart %}
+    <div class="table-responsive bg-white p-3 rounded shadow-sm border">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Item</th>
+            <th>Image</th>
+            <th class="text-center">Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart %}
+          <tr>
+            <td>
+              <span class="fw-bold d-block text-dark">{{ item.name_display }}</span>
+              {% if item.variant %}
+                <small class="text-muted">Stock available: {{ item.variant.stock }}</small>
+              {% else %}
+                <small class="text-muted">Stock available: {{ item.product.stock }}</small>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.image %}
+                <img src="{{ item.image.url }}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: #FAF8F5;">
+              {% else %}
+                <span class="text-muted small">No Image</span>
+              {% endif %}
+            </td>
+            <td>
+              <!-- Quantity adjustment buttons (+ and -) -->
+              <div class="d-flex justify-content-center align-items-center gap-2">
+                <form action="{% url 'cart_update' item.product.id %}" method="POST" class="d-inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="variant_id" value="{% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}">
+                  <input type="hidden" name="action" value="decrease">
+                  <button type="submit" class="btn btn-outline-secondary btn-sm px-2 py-0 fw-bold">-</button>
+                </form>
+
+                <span class="fw-bold px-2">{{ item.quantity }}</span>
+
+                <form action="{% url 'cart_update' item.product.id %}" method="POST" class="d-inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="variant_id" value="{% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}">
+                  <input type="hidden" name="action" value="increase">
+                  <button type="submit" class="btn btn-outline-secondary btn-sm px-2 py-0 fw-bold">+</button>
+                </form>
+              </div>
+            </td>
+            <td>${{ item.price }}</td>
+            <td class="fw-bold">${{ item.total_price }}</td>
+            <td class="text-end">
+              <a href="{% url 'cart_remove' item.product.id %}?variant_id={% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}" class="btn btn-outline-danger btn-sm">
+                <i class="fa-solid fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4 p-4 bg-white border rounded shadow-sm">
+      <h4 class="fw-bold mb-0 text-dark">Total: ${{ cart.get_total_price }}</h4>
+     
+      <a href="{% url 'shop_list' %}" class="btn btn-dark px-5 py-3 fw-bold">Proceed to Checkout</a>
+    </div>
+  {% else %}
+    <div class="text-center py-5 bg-white rounded border shadow-sm">
+      <p class="fs-5 text-muted mb-3">Your shopping cart is currently empty.</p>
+      <a href="{% url 'shop_list' %}" class="btn btn-dark px-4 py-2 fw-bold">Explore the Souvenir Shop</a>
+    </div>
+  {% endif %}
+</div>
+{% include 'tours/contact.html' %}
 {% endblock %}
