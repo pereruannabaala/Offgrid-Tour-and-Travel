@@ -18,6 +18,7 @@ urlpatterns = [
     path('shop/retry-payment/<uuid:token>/', views.retry_mpesa_payment, name='retry_mpesa_payment'),
     path('shop/cart/update/<int:product_id>/', views.cart_update, name='cart_update'),
     path('safari-inquiry/', safari_inquiry_view, name='safari_inquiry'),
+    path('checkout/', views.guest_checkout, name='guest_checkout'),
 ]
 
 

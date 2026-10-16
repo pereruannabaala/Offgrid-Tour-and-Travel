@@ -15,8 +15,6 @@ class Cart:
     def add(self, product, variant=None, quantity=1, override_quantity=False):
         """
         Add a product or its specific variant to the cart, or update its quantity.
-        We use a unique cart key to separate base products from specific variants 
-        (e.g., product_id_variant_id).
         """
         product_id = str(product.id)
         variant_id = str(variant.id) if variant else 'None'
@@ -26,7 +24,9 @@ class Cart:
             price = variant.get_price_usd() if variant else product.price_usd
             self.cart[cart_key] = {
                 'product_id': product.id,
+                'product_name': product.name,  # Save product name here
                 'variant_id': variant.id if variant else None,
+                'variant_name': variant.name if variant else None,  # Save variant name here
                 'quantity': 0,
                 'price': str(price),
             }
@@ -38,6 +38,41 @@ class Cart:
         
         self.save()
 
+    def __iter__(self):
+        """Iterate over the items in the cart and safely fetch products from the database."""
+        cart_keys = list(self.cart.keys())
+        for cart_key in cart_keys:
+            item_data = self.cart[cart_key].copy()
+            
+            try:
+                product = Product.objects.get(id=item_data['product_id'])
+            except Product.DoesNotExist:
+                del self.cart[cart_key]
+                self.save()
+                continue
+
+            item_data['product'] = product
+            item_data['product_name'] = product.name
+            
+            # Check if it has a variant
+            if item_data['variant_id']:
+                try:
+                    variant = ProductVariant.objects.get(id=item_data['variant_id'])
+                    item_data['variant'] = variant
+                    item_data['variant_name'] = variant.name
+                    item_data['image'] = variant.image if variant.image else product.image
+                except ProductVariant.DoesNotExist:
+                    item_data['variant_id'] = None
+                    item_data['variant_name'] = None
+                    item_data['image'] = product.image
+            else:
+                item_data['variant_name'] = None
+                item_data['image'] = product.image
+
+            item_data['price'] = Decimal(item_data['price'])
+            item_data['total_price'] = item_data['price'] * item_data['quantity']
+            yield item_data
+            
     def save(self):
         # Mark the session as "modified" to ensure it gets saved/persisted
         self.session.modified = True
@@ -48,41 +83,6 @@ class Cart:
         if cart_key in self.cart:
             del self.cart[cart_key]
             self.save()
-
-    def __iter__(self):
-        """Iterate over the items in the cart and safely fetch products from the database."""
-        cart_keys = list(self.cart.keys())
-        for cart_key in cart_keys:
-            item_data = self.cart[cart_key].copy()
-            
-            try:
-                product = Product.objects.get(id=item_data['product_id'])
-            except Product.DoesNotExist:
-                # Clean out stale items if the product was deleted from the database
-                del self.cart[cart_key]
-                self.save()
-                continue
-
-            item_data['product'] = product
-            
-            # Check if it has a variant
-            if item_data['variant_id']:
-                try:
-                    variant = ProductVariant.objects.get(id=item_data['variant_id'])
-                    item_data['variant'] = variant
-                    item_data['name_display'] = f"{product.name} ({variant.name})"
-                    item_data['image'] = variant.image if variant.image else product.image
-                except ProductVariant.DoesNotExist:
-                    item_data['variant_id'] = None
-                    item_data['name_display'] = product.name
-                    item_data['image'] = product.image
-            else:
-                item_data['name_display'] = product.name
-                item_data['image'] = product.image
-
-            item_data['price'] = Decimal(item_data['price'])
-            item_data['total_price'] = item_data['price'] * item_data['quantity']
-            yield item_data
 
     def __len__(self):
         """Count all items in the cart safely."""

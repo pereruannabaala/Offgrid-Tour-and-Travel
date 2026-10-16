@@ -138,8 +138,7 @@
             <div class="d-flex flex-column gap-3">
               {% for variant in product.variants.all %}
               <div>
-                <input type="radio" id="variant-{{ variant.id }}" name="variant_id" value="{{ variant.id }}" class="d-none variant-radio" {% if variant.stock <= 0 %}disabled{% endif %}>
-                
+                <input type="radio" id="variant-{{ variant.id }}" name="variant_id" value="{{ variant.id }}" class="d-none variant-radio" {% if variant.stock > 0 and forloop.first %}checked{% endif %} {% if variant.stock <= 0 %}disabled{% endif %}>
                 <label for="variant-{{ variant.id }}" class="d-block w-100 {% if variant.stock <= 0 %}opacity-50 cursor-not-allowed{% endif %}">
                   <div class="variant-option-card d-flex justify-content-between align-items-center" id="card-{{ variant.id }}">
                     <div class="d-flex align-items-center gap-3">

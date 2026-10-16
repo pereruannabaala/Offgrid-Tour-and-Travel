@@ -136,11 +136,11 @@ class Product(models.Model):
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
-    name = models.CharField(max_length=100) # e.g., "Mini Zebra", "Mid Zebra", "Large Zebra"
+    name = models.CharField(max_length=100) # e.g., "Mini", "Mid", "Large"
     price_usd = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     price_kes = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    image = models.ImageField(upload_to='variants/', blank=True, null=True) # Variant-specific image
-    stock = models.PositiveIntegerField(default=10) # Variant stock level
+    image = models.ImageField(upload_to='variants/', blank=True, null=True)
+    stock = models.PositiveIntegerField(default=10)
 
     def get_price_usd(self):
         return self.price_usd if self.price_usd else self.product.price_usd
@@ -149,10 +149,9 @@ class ProductVariant(models.Model):
         return self.price_kes if self.price_kes else self.product.price_kes
 
     def __str__(self):
-        return f"{self.product.name} - {self.name}"
+        return self.name
 
 class Order(models.Model):
-    # ... (keep all your fields up to __str__)
 
     def __str__(self):
         return f"Order #{self.id} - {self.full_name} ({self.email})" 
@@ -219,6 +218,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, blank=True, null=True) # <-- Add this line
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(default=1)
 

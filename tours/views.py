@@ -156,23 +156,23 @@ def cart_add(request, product_id):
     variant = None
     variant_id = request.POST.get('variant_id')
     
-    if variant_id and variant_id != 'None':
-        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
-        available_stock = variant.stock
+    if product.variants.exists():
+        if variant_id and variant_id != 'None':
+            variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+        else:
+            variant = product.variants.filter(stock__gt=0).first()
+            
+        available_stock = variant.stock if variant else 0
     else:
-        # If product has variants, a variant MUST be selected
-        if product.variants.exists() and not variant:
-            # Redirect back with a message or to the detail page if no variant was chosen
-            return redirect('product_detail', product_id=product.id)
         available_stock = product.stock
 
-    # Check stock validation before adding
     if available_stock <= 0:
         return redirect('product_detail', product_id=product.id)
 
     cart.add(product=product, variant=variant, quantity=1)
     return redirect('cart_detail')
-    
+
+
 def cart_remove(request, product_id):
     cart = Cart(request)
     variant_id = request.GET.get('variant_id') or None
@@ -248,26 +248,29 @@ def guest_checkout(request):
             payment_status='pending'
         )
 
-        # 2. Save Order Items
-
         # 2. Save Order Items and Reduce Stock
         for item in cart:
-            # Depending on how your Cart helper handles item objects or dictionaries:
             prod = item.get('product')
+            variant = item.get('variant') # Get the variant object from cart item
             qty = item.get('quantity', 1)
             
-            # If using session cart dictionary keys:
-            # (Adjust based on how your cart items are accessed)
-            if hasattr(prod, 'stock'):
+            # Reduce stock appropriately (Variant stock if it exists, otherwise product stock)
+            if variant:
+                variant.stock = max(0, variant.stock - qty)
+                variant.save()
+            elif hasattr(prod, 'stock') and prod.stock is not None:
                 prod.stock = max(0, prod.stock - qty)
                 prod.save()
 
+            # Create OrderItem with both product and variant
             OrderItem.objects.create(
                 order=order,
                 product=prod,
+                variant=variant,
                 price=item['price'],
                 quantity=qty
             )
+
         # 3. Send Confirmation Email
         
         tracking_url = request.build_absolute_uri(
