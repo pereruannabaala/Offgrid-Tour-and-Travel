@@ -12,6 +12,12 @@ if [ "${DJANGO_COLLECTSTATIC:-1}" = "1" ]; then
     python manage.py collectstatic --noinput --clear -v 0
 fi
 
+# Web-optimised image renditions; only missing or changed images are processed.
+if [ "${DJANGO_BUILD_RENDITIONS:-1}" = "1" ]; then
+    echo "→ Building image renditions"
+    python manage.py build_renditions
+fi
+
 # Optionally bootstrap an admin account (idempotent).
 if [ -n "${DJANGO_SUPERUSER_USERNAME:-}" ] && [ -n "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
     python manage.py shell -c "

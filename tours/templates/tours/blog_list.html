@@ -1,4 +1,5 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 <style>
@@ -181,7 +182,10 @@
 
 <!-- Wide Hero Banner Image (Dynamic via Django Admin) -->
 <section class="position-relative overflow-hidden text-white d-flex align-items-center" 
-         style="min-height: 650px; background-image: url('{% if header and header.background_image %}{{ header.background_image.url }}{% endif %}'); background-position: center; background-size: cover; background-repeat: no-repeat; background-color: #2c221e;">
+         style="min-height: 650px; background-color: #2c221e;">
+    {% if header and header.background_image %}
+        {% responsive_image header.background_image sizes="100vw" loading="eager" fetchpriority="high" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" %}
+    {% endif %}
     
     <div class="position-absolute top-0 start-0 w-100 h-100" 
          style="background: linear-gradient(180deg, rgba(44, 34, 30, 0.4) 0%, rgba(44, 34, 30, 0.85) 100%);"></div>
@@ -202,7 +206,7 @@
   {% if featured_post %}
   <a href="{% url 'blog_detail' featured_post.slug %}" class="featured-card">
     <div class="featured-card__img-wrap">
-      <img src="{{ featured_post.featured_image.url }}" alt="{{ featured_post.title }}">
+      {% responsive_image featured_post.featured_image sizes="(min-width: 1200px) 640px, (min-width: 850px) 55vw, 100vw" alt=featured_post.title %}
     </div>
     <div>
       <span class="featured-card__cat">{{ featured_post.category }}</span>
@@ -218,7 +222,7 @@
     {% for post in posts %}
     <a href="{% url 'blog_detail' post.slug %}" class="blog-card">
       <div class="blog-card__img-wrap">
-        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" loading="lazy">
+        {% responsive_image post.featured_image sizes="(min-width: 1024px) 370px, (min-width: 768px) 50vw, 100vw" alt=post.title %}
       </div>
       <span class="blog-card__cat">{{ post.category }}</span>
       <h3 class="blog-card__title">{{ post.title }}</h3>

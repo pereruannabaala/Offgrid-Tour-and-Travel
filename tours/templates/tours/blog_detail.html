@@ -1,5 +1,5 @@
 {% extends 'tours/base.html' %}
-{% load static %}
+{% load static responsive_images %}
 
 {% block content %}
 <!-- Include CKEditor 5 default CSS styles for rendered content -->
@@ -142,7 +142,7 @@
 
   {% if post.featured_image %}
   <div style="max-width: 1000px; margin: 0 auto;">
-    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="article-hero-img">
+    {% responsive_image post.featured_image sizes="(min-width: 1000px) 1000px, 100vw" alt=post.title loading="eager" fetchpriority="high" class="article-hero-img" %}
   </div>
   {% endif %}
 

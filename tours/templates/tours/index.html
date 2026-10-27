@@ -1,4 +1,5 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 <!-- Hero Section Carousel (3 Images Max - Speed set to 3 seconds) -->
@@ -14,7 +15,7 @@
     <div class="carousel-inner h-100">
         {% for slide in hero_slides|slice:":3" %}
         <div class="carousel-item h-100 {% if forloop.first %}active{% endif %}">
-            <img src="{{ slide.image.url }}" class="d-block w-100 h-100 object-fit-cover" alt="{{ slide.title }}">
+            {% responsive_image slide.image sizes="100vw" alt=slide.title loading="eager" fetchpriority=forloop.first|yesno:"high,low" class="d-block w-100 h-100 object-fit-cover" %}
             <div class="hero-overlay"></div>
             <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100 z-2">
                 <h1 class="hero-title mb-1">{{ slide.title|default:"Kaelo Tours & Travel" }}</h1>
@@ -96,7 +97,7 @@
                 <!-- Dynamic Bottom Left Image (Uploaded via Admin) -->
                 <div class="mt-3 overflow-hidden earth-img-frame">
                     {% if what_we_do.bottom_image %}
-                        <img src="{{ what_we_do.bottom_image.url }}" alt="Savanna Landscape" class="img-fluid w-100 object-fit-cover" style="max-height: 290px;">
+                        {% responsive_image what_we_do.bottom_image sizes="(min-width: 1400px) 636px, (min-width: 992px) 50vw, 100vw" alt="Savanna Landscape" class="img-fluid w-100 object-fit-cover" style="max-height: 290px;" %}
                     {% else %}
                         <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=80" alt="Savanna Sunset" class="img-fluid w-100 object-fit-cover" style="max-height: 290px;">
                     {% endif %}
@@ -108,7 +109,7 @@
                 <!-- Dynamic Top Right Image (Uploaded via Admin) -->
                 <div class="mb-4 overflow-hidden earth-img-frame">
                     {% if what_we_do.top_image %}
-                        <img src="{{ what_we_do.top_image.url }}" alt="Wildlife Focus" class="img-fluid w-100 object-fit-cover" style="max-height: 310px;">
+                        {% responsive_image what_we_do.top_image sizes="(min-width: 1400px) 636px, (min-width: 992px) 50vw, 100vw" alt="Wildlife Focus" class="img-fluid w-100 object-fit-cover" style="max-height: 310px;" %}
                     {% else %}
                         <img src="https://images.unsplash.com/photo-1534177616072-ef7dc120449d?auto=format&fit=crop&w=800&q=80" alt="Wildlife Encounter" class="img-fluid w-100 object-fit-cover" style="max-height: 310px;">
                     {% endif %}

@@ -1,4 +1,5 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 
@@ -287,11 +288,8 @@
   <div class="eg-grid">
     {% for photo in photos %}
     <figure class="eg-item" data-category="{{ photo.category }}" data-caption="{{ photo.caption }}{% if photo.place %} — {{ photo.place }}{% endif %}">
-      <img
-        src="{% if photo.thumb %}{{ photo.thumb }}{% else %}{{ photo.image }}{% endif %}"
-        data-full="{{ photo.image }}"
-        alt="{{ photo.caption }}"
-        loading="lazy">
+      {% image_renditions photo.image as full %}
+      {% responsive_image photo.thumb sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 380px" alt=photo.caption data_full=full.large data_full_srcset=full.fallback_srcset data_full_webp=full.webp_srcset %}
       <figcaption class="eg-item__caption">
         <p class="eg-item__caption-title">{{ photo.caption }}</p>
         {% if photo.place %}
@@ -308,7 +306,10 @@
     <button class="eg-lightbox__close" aria-label="Close">&times;</button>
     <button class="eg-lightbox__prev" aria-label="Previous">&#8249;</button>
     <figure class="eg-lightbox__figure">
-      <img class="eg-lightbox__img" src="" alt="">
+      <picture class="ri">
+        <source type="image/webp" class="eg-lightbox__source" sizes="100vw">
+        <img class="eg-lightbox__img" src="" alt="" sizes="100vw">
+      </picture>
       <figcaption class="eg-lightbox__caption"></figcaption>
     </figure>
     <button class="eg-lightbox__next" aria-label="Next">&#8250;</button>
@@ -328,6 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const lightbox = root.querySelector('.eg-lightbox');
   const lightboxImg = lightbox.querySelector('.eg-lightbox__img');
+  const lightboxSource = lightbox.querySelector('.eg-lightbox__source');
   const lightboxCaption = lightbox.querySelector('.eg-lightbox__caption');
   const lightboxCount = lightbox.querySelector('.eg-lightbox__count');
   const closeBtn = lightbox.querySelector('.eg-lightbox__close');
@@ -379,6 +381,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const item = visibleItems[currentIndex];
     if (!item) return;
     const img = item.querySelector('img');
+    lightboxSource.srcset = img.dataset.fullWebp || '';
+    lightboxImg.srcset = img.dataset.fullSrcset || '';
     lightboxImg.src = img.dataset.full || img.src;
     lightboxImg.alt = img.alt || '';
     lightboxCaption.textContent = item.dataset.caption || '';

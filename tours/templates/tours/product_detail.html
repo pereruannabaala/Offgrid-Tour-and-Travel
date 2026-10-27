@@ -1,4 +1,5 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 <style>
@@ -111,9 +112,10 @@
     <div class="row g-5 align-items-center detail-card p-4 p-lg-5">
       <!-- Product Image Column (Clickable to Zoom Modal) -->
       <div class="col-lg-6">
-        <div class="detail-img-container rounded" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImageModal('{{ product.image.url }}', '{{ product.name }}')">
+        {% image_renditions product.image as zoom %}
+        <div class="detail-img-container rounded" {% if product.image %}data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImageModal(this)" data-title="{{ product.name }}" data-src="{{ zoom.large }}" data-srcset="{{ zoom.fallback_srcset }}" data-webp-srcset="{{ zoom.webp_srcset }}"{% endif %}>
           {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="detail-img" id="mainProductImg">
+            {% responsive_image product.image sizes="(min-width: 1400px) 600px, (min-width: 992px) 45vw, 100vw" alt=product.name loading="eager" fetchpriority="high" class="detail-img" id="mainProductImg" %}
           {% else %}
             <span class="text-muted">No Image Available</span>
           {% endif %}
@@ -143,8 +145,9 @@
                   <div class="variant-option-card d-flex justify-content-between align-items-center" id="card-{{ variant.id }}">
                     <div class="d-flex align-items-center gap-3">
                       {% if variant.image %}
-                        <span role="button" class="d-inline-block" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="event.preventDefault(); event.stopPropagation(); showImageModal('{{ variant.image.url }}', '{{ product.name }} - {{ variant.name }}');">
-                          <img src="{{ variant.image.url }}" alt="{{ variant.name }}" class="variant-thumb" title="Click to view full image">
+                        {% image_renditions variant.image as zoom %}
+                        <span role="button" class="d-inline-block" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="event.preventDefault(); event.stopPropagation(); showImageModal(this);" data-title="{{ product.name }} - {{ variant.name }}" data-src="{{ zoom.large }}" data-srcset="{{ zoom.fallback_srcset }}" data-webp-srcset="{{ zoom.webp_srcset }}">
+                          {% responsive_image variant.image sizes="50px" alt=variant.name class="variant-thumb" title="Click to view full image" %}
                         </span>
                       {% endif %}
                       <div>
@@ -198,15 +201,24 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center p-4">
-        <img src="" id="modalImageElement" class="img-fluid rounded" style="max-height: 75vh; object-fit: contain;">
+        <picture class="ri">
+          <source type="image/webp" id="modalImageSource" sizes="(min-width: 992px) 760px, 100vw">
+          <img src="" alt="" id="modalImageElement" class="img-fluid rounded" sizes="(min-width: 992px) 760px, 100vw" style="max-height: 75vh; object-fit: contain;">
+        </picture>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-function showImageModal(url, title) {
-  document.getElementById('modalImageElement').src = url;
+function showImageModal(trigger) {
+  const { title, src, srcset, webpSrcset } = trigger.dataset;
+  const img = document.getElementById('modalImageElement');
+  // Set srcsets before src so the browser fetches only the size it needs.
+  document.getElementById('modalImageSource').srcset = webpSrcset || '';
+  img.srcset = srcset || '';
+  img.src = src;
+  img.alt = title;
   document.getElementById('modalImageTitle').innerText = title;
 }
 

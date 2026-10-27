@@ -131,6 +131,13 @@
             color: var(--earth-clay);
         }
 
+        /* Responsive images (the responsive_image template tag): the <picture> wrapper takes no box of
+           its own, so existing img rules and h-100 / absolute positioning behave as before.
+           :where() keeps specificity at zero so any component rule overrides it; height:auto
+           keeps the width/height attributes from stretching images that set no height. */
+        :where(picture.ri) { display: contents; }
+        :where(picture.ri > img) { height: auto; }
+
         .earth-img-frame {
             border-radius: 4px;
             box-shadow: 0 12px 30px rgba(44, 34, 30, 0.08);

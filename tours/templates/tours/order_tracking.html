@@ -1,4 +1,5 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 <section class="py-5" style="background-color: #F2ECDC; min-height: 80vh;">
@@ -86,7 +87,7 @@
               <td>
                 <div class="d-flex align-items-center">
                   {% if item.product.image %}
-                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                    {% responsive_image item.product.image sizes="50px" alt=item.product.name class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" %}
                   {% endif %}
                   <span>{{ item.product.name }}</span>
                 </div>

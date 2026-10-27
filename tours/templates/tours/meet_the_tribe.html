@@ -1,10 +1,14 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 
 <!-- Wide Hero Banner Image (Dynamic via Django Admin) -->
 <section class="position-relative overflow-hidden text-white d-flex align-items-center" 
-         style="min-height: 650px; background-image: url('{% if header and header.background_image %}{{ header.background_image.url }}{% endif %}'); background-position: center; background-size: cover; background-repeat: no-repeat; background-color: #2c221e;">
+         style="min-height: 650px; background-color: #2c221e;">
+    {% if header and header.background_image %}
+        {% responsive_image header.background_image sizes="100vw" loading="eager" fetchpriority="high" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" %}
+    {% endif %}
     
     <div class="position-absolute top-0 start-0 w-100 h-100" 
          style="background: linear-gradient(180deg, rgba(44, 34, 30, 0.4) 0%, rgba(44, 34, 30, 0.85) 100%);"></div>
@@ -26,7 +30,7 @@
             <div class="row g-5 align-items-center mb-5 {% if forloop.counter|divisibleby:2 %}flex-md-row-reverse{% endif %}">
                 <!-- Member Image -->
                 <div class="col-md-5">
-                    <img src="{{ member.image.url }}" alt="{{ member.name }}" class="img-fluid rounded shadow-sm w-100" style="object-fit: cover; max-height: 450px;">
+                    {% responsive_image member.image sizes="(min-width: 1400px) 530px, (min-width: 768px) 42vw, 100vw" alt=member.name class="img-fluid rounded shadow-sm w-100" style="object-fit: cover; max-height: 450px;" %}
                 </div>
                 
                 <!-- Member Bio -->

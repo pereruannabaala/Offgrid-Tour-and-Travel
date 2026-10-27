@@ -104,8 +104,8 @@ def gallery(request):
     return render(request, "tours/gallery.html", {
         "photos": [
             {
-                "image": p.image.url,
-                "thumb": p.thumb.url if p.thumb else p.image.url,
+                "image": p.image,
+                "thumb": p.thumb or p.image,
             }
             for p in photos
         ],

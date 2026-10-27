@@ -1,4 +1,5 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 <style>
@@ -92,7 +93,7 @@
           <!-- Clickable Full image container -->
           <a href="{% url 'product_detail' product.id %}" class="product-img-container text-decoration-none">
             {% if product.image %}
-              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+              {% responsive_image product.image sizes="(min-width: 1400px) 416px, (min-width: 992px) 33vw, (min-width: 768px) 50vw, 100vw" alt=product.name class="product-img" %}
             {% else %}
               <span class="text-muted small">No Image Available</span>
             {% endif %}

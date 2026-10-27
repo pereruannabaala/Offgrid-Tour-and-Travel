@@ -1,4 +1,5 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 <div class="container py-5 mt-5">
@@ -69,7 +70,7 @@
                         <tbody>
                             {% for slide in slides %}
                             <tr>
-                                <td><img src="{{ slide.image.url }}" style="height:40px; width:60px; object-fit:cover; border-radius:4px;"></td>
+                                <td>{% responsive_image slide.image sizes="60px" alt=slide.title style="height:40px; width:60px; object-fit:cover; border-radius:4px;" %}</td>
                                 <td>{{ slide.title }}</td>
                                 <td><span class="badge bg-info">{{ slide.category }}</span></td>
                                 <td>{{ slide.created_at|date:"M d, Y" }}</td>

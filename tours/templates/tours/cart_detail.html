@@ -1,4 +1,5 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {% block content %}
 <div class="container py-5" style="font-family: 'Work Sans', sans-serif; min-height: 70vh;">
@@ -41,7 +42,7 @@
             </td>
             <td>
               {% if item.image %}
-                <img src="{{ item.image.url }}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: #FAF8F5;">
+                {% responsive_image item.image sizes="50px" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: #FAF8F5;" %}
               {% else %}
                 <span class="text-muted small">No Image</span>
               {% endif %}
