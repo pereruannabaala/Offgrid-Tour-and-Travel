@@ -1,11 +1,12 @@
 import json
 import re
+from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.urls import reverse
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .cart import Cart
@@ -34,6 +35,16 @@ def format_phone_number(phone):
         return f"254{cleaned}"
     
     return cleaned
+
+
+def shop_view(view):
+    """Serve a shop page only while settings.SHOP_ENABLED is on; 404 otherwise."""
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if not settings.SHOP_ENABLED:
+            raise Http404('The shop is currently closed.')
+        return view(request, *args, **kwargs)
+    return wrapper
 
 
 def is_superuser(user):
@@ -139,16 +150,19 @@ def blog_detail(request, slug):
     })
 
 
+@shop_view
 def shop_list(request):
     products = Product.objects.all()
     return render(request, 'tours/shop_list.html', {'products': products})
 
+@shop_view
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     return render(request, 'tours/product_detail.html', {'product': product})
 
 
 
+@shop_view
 def cart_add(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
@@ -173,6 +187,7 @@ def cart_add(request, product_id):
     return redirect('cart_detail')
 
 
+@shop_view
 def cart_remove(request, product_id):
     cart = Cart(request)
     variant_id = request.GET.get('variant_id') or None
@@ -181,10 +196,12 @@ def cart_remove(request, product_id):
     cart.remove(product_id=product_id, variant_id=variant_id)
     return redirect('cart_detail')
 
+@shop_view
 def cart_detail(request):
     cart = Cart(request)
     return render(request, 'tours/cart_detail.html', {'cart': cart})
 
+@shop_view
 def cart_update(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
@@ -215,6 +232,7 @@ def cart_update(request, product_id):
 
     return redirect('cart_detail')
 
+@shop_view
 def guest_checkout(request):
     cart = Cart(request)
     if not cart:

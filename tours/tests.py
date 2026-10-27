@@ -12,7 +12,7 @@ from django.urls import reverse
 from PIL import Image
 
 from tours import images
-from tours.models import ExpeditionPhoto, TeamMember
+from tours.models import ExpeditionPhoto, Order, Product, TeamMember
 
 
 def make_image(size=(4000, 3000), mode='RGB', fmt='JPEG', orientation=None):
@@ -171,3 +171,37 @@ class NavigationTests(TestCase):
         for section in ('our-story', 'our-experiences', 'contact'):
             self.assertContains(response, f'id="{section}"')
 
+
+SHOP_URLS = [
+    ('shop_list', []), ('product_detail', [1]), ('cart_detail', []), ('cart_add', [1]),
+    ('cart_remove', [1]), ('cart_update', [1]), ('guest_checkout', []),
+]
+
+
+@override_settings(SHOP_ENABLED=False)
+class ShopDisabledTests(TestCase):
+    def test_shop_pages_return_404(self):
+        for name, args in SHOP_URLS:
+            with self.subTest(name):
+                self.assertEqual(self.client.get(reverse(name, args=args)).status_code, 404)
+                self.assertEqual(self.client.post(reverse(name, args=args)).status_code, 404)
+
+    def test_shop_and_cart_hidden_from_navigation(self):
+        response = self.client.get(reverse('index'))
+        self.assertNotContains(response, f'href="{reverse("shop_list")}"')
+        self.assertNotContains(response, f'href="{reverse("cart_detail")}"')
+
+    def test_existing_orders_can_still_be_tracked(self):
+        order = Order.objects.create(email='a@b.co', phone='0700000000', full_name='A', total_amount=5)
+        response = self.client.get(reverse('guest_order_tracking', args=[order.tracking_token]))
+        self.assertContains(response, 'Back to Home')
+        self.assertNotContains(response, f'href="{reverse("shop_list")}"')
+
+
+@override_settings(SHOP_ENABLED=True)
+class ShopEnabledTests(TestCase):
+    def test_shop_is_listed_and_reachable(self):
+        product = Product.objects.create(name='Zebra', price_usd=5, price_kes=650)
+        self.assertContains(self.client.get(reverse('index')), f'href="{reverse("shop_list")}"')
+        self.assertContains(self.client.get(reverse('shop_list')), 'Zebra')
+        self.assertEqual(self.client.get(reverse('product_detail', args=[product.id])).status_code, 200)

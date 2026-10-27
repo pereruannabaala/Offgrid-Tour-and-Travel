@@ -144,6 +144,11 @@ DEFAULT_FROM_EMAIL = 'kaeloexpeditions@gmail.com'
 # Cart Session ID
 CART_SESSION_ID = 'cart'
 
+# Souvenir shop (catalogue, cart, checkout). Off hides it from the site and
+# returns 404 for its pages; products stay editable in the admin and existing
+# orders can still be tracked and paid. Set SHOP_ENABLED=True to reopen it.
+SHOP_ENABLED = env.bool('SHOP_ENABLED', default=False)
+
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 STATIC_ROOT = env('STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))

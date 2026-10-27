@@ -256,14 +256,16 @@
                         </a>
                     </li>
                     
+                    {% if shop_enabled %}
                     <li class="nav-item ms-lg-2">
                         <a class="btn btn-light-brown btn-sm rounded-pill px-3 py-2 fw-bold {% if request.resolver_match.url_name == 'shop_list' %}active{% endif %}" 
                         href="{% url 'shop_list' %}">
                             <i class="fa-solid fa-bag-shopping me-1"></i> Shop
                         </a>
                     </li>
+                    {% endif %}
 
-                    {% if cart_item_count > 0 %}
+                    {% if shop_enabled and cart_item_count > 0 %}
                     <li class="nav-item">
                         <a class="btn btn-dark btn-sm rounded-pill px-3 py-2 fw-bold position-relative border border-secondary border-opacity-50" href="{% url 'cart_detail' %}">
                             <i class="fa-solid fa-cart-shopping me-1"></i> Cart
