@@ -19,6 +19,8 @@ urlpatterns = [
     path('shop/cart/update/<int:product_id>/', views.cart_update, name='cart_update'),
     path('safari-inquiry/', safari_inquiry_view, name='safari_inquiry'),
     path('checkout/', views.guest_checkout, name='guest_checkout'),
+    path('order/track/<uuid:token>/', views.guest_order_tracking, name='guest_order_tracking'),
+    path('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
 ]
 
 
