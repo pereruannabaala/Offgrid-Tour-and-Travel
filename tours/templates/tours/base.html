@@ -27,6 +27,7 @@
 
         html {
             scroll-behavior: smooth;
+            scroll-padding-top: 90px; /* keep in-page anchor targets clear of the fixed navbar */
         }
 
         body {
@@ -204,7 +205,7 @@
         }
     </style>
 </head>
-<body>
+<body{% block body_attrs %}{% endblock %}>
 
     <!-- Header Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-custom px-lg-5 px-3">
@@ -221,14 +222,12 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-lg-center gap-lg-3 my-3 my-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'our_story' or request.resolver_match.url_name == 'home' and not request.resolver_match.url_name %}active{% endif %}" 
-                        href="#our-story">
+                        <a class="nav-link" href="{% url 'index' %}#our-story">
                             Our Story
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'our_experiences' %}active{% endif %}" 
-                        href="#our-experiences">
+                        <a class="nav-link" href="{% url 'index' %}#our-experiences">
                             Experiences
                         </a>
                     </li>
@@ -251,8 +250,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 
-                        href="#contact">
+                        {# Pages that don't include tours/contact.html override this to point at the home page's form. #}
+                        <a class="nav-link" href="{% block contact_href %}#contact{% endblock %}">
                             Contact
                         </a>
                     </li>
@@ -292,5 +291,39 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function () {
+        // Sections that only exist on the home page, plus old spellings that
+        // have circulated in shared links.
+        var HOME_SECTIONS = { 'our-story': 'our-story', 'our-experiences': 'our-experiences',
+                              'our-experience': 'our-experiences', 'experiences': 'our-experiences',
+                              'contact': 'contact' };
+        var HOME_URL = '{% url 'index' %}';
+
+        // Repair links like /expedition-gallery/#our-experience that point at a
+        // section this page doesn't have: send them to the home page section,
+        // or drop a fragment that matches nothing.
+        function repairHash() {
+            var id = decodeURIComponent(location.hash.slice(1));
+            if (!id || document.getElementById(id)) return;
+            var target = HOME_SECTIONS[id];
+            if (target && (location.pathname !== HOME_URL || target !== id)) {
+                location.replace(HOME_URL + '#' + target);
+            } else {
+                history.replaceState(null, '', location.pathname + location.search);
+            }
+        }
+        repairHash();
+        window.addEventListener('hashchange', repairHash);
+
+        // Close the mobile menu after picking a link that scrolls within the page.
+        var menu = document.getElementById('navbarNav');
+        menu.addEventListener('click', function (event) {
+            if (event.target.closest('a') && menu.classList.contains('show')) {
+                bootstrap.Collapse.getOrCreateInstance(menu).hide();
+            }
+        });
+    })();
+    </script>
 </body>
 </html>

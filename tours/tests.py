@@ -144,3 +144,30 @@ class IntegrationTests(MediaTestCase):
         self.assertContains(response, 'data-full-webp=')
         self.assertContains(response, '1920.jpg?v=')
         self.assertNotContains(response, 'src="/media/expeditions/p.jpg"')
+
+
+class NavigationTests(TestCase):
+    def test_home_section_links_work_from_any_page(self):
+        response = self.client.get(reverse('expedition_gallery'))
+        self.assertContains(response, 'href="/#our-story"')
+        self.assertContains(response, 'href="/#our-experiences"')
+        self.assertNotContains(response, 'href="#our-')
+
+    def test_contact_scrolls_on_pages_that_have_the_form(self):
+        response = self.client.get(reverse('expedition_gallery'))
+        self.assertContains(response, 'href="#contact"')
+        self.assertContains(response, '<section id="contact"')
+
+    def test_contact_points_home_on_pages_without_the_form(self):
+        response = self.client.get('/no-such-page/')
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, 'href="/#contact"', status_code=404)
+        self.assertNotContains(response, 'href="#contact"', status_code=404)
+
+    def test_home_page_has_no_dead_links_and_spies_on_sections(self):
+        response = self.client.get(reverse('index'))
+        self.assertNotContains(response, 'href="#"')
+        self.assertContains(response, 'data-bs-spy="scroll"')
+        for section in ('our-story', 'our-experiences', 'contact'):
+            self.assertContains(response, f'id="{section}"')
+

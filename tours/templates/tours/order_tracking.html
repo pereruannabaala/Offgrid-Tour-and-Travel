@@ -1,6 +1,9 @@
 {% extends 'tours/base.html' %}
 {% load responsive_images %}
 
+{# This page has no contact section; send the navbar link to the home page's. #}
+{% block contact_href %}{% url 'index' %}#contact{% endblock %}
+
 {% block content %}
 <section class="py-5" style="background-color: #F2ECDC; min-height: 80vh;">
   <div class="container" style="max-width: 800px;">

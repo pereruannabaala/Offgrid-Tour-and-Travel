@@ -1,0 +1,21 @@
+{% extends 'tours/base.html' %}
+
+{% block contact_href %}{% url 'index' %}#contact{% endblock %}
+
+{% block content %}
+<section class="d-flex align-items-center text-center bg-earth-sand text-earth-dark" style="min-height: 80vh; padding-top: 90px;">
+    <div class="container py-5">
+        <span class="text-terracotta text-uppercase fw-bold small d-block mb-3">Page not found</span>
+        <h1 class="display-4 font-serif mb-3">This trail doesn't lead anywhere</h1>
+        <p class="mb-4 opacity-75 mx-auto" style="max-width: 34rem;">
+            The page you were looking for has moved or is no longer available.
+            Let's get you back on track.
+        </p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="{% url 'index' %}" class="btn btn-light-brown px-4 py-2 fw-bold">Back to Home</a>
+            <a href="{% url 'expedition_gallery' %}" class="btn btn-outline-dark px-4 py-2">View the Gallery</a>
+            <a href="{% url 'index' %}#contact" class="btn btn-outline-dark px-4 py-2">Plan a Safari</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

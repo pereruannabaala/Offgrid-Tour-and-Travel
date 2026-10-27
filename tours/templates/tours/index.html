@@ -1,6 +1,9 @@
 {% extends 'tours/base.html' %}
 {% load responsive_images %}
 
+{# Highlight Our Story / Experiences / Contact in the navbar while scrolling past them. #}
+{% block body_attrs %} data-bs-spy="scroll" data-bs-target="#navbarNav"{% endblock %}
+
 {% block content %}
 <!-- Hero Section Carousel (3 Images Max - Speed set to 3 seconds) -->
 <div id="heroCarousel" class="carousel slide carousel-fade hero-carousel" data-bs-ride="carousel" data-bs-interval="3000">
@@ -20,7 +23,7 @@
             <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100 z-2">
                 <h1 class="hero-title mb-1">{{ slide.title|default:"Kaelo Tours & Travel" }}</h1>
                 <p class="hero-subtitle mb-4">{{ slide.subtitle|default:"Unforgettable Journey Through the Heart of the Maasai Mara" }}</p>
-                <a href="#" class="btn btn-light-brown btn-lg px-4 py-2 mt-2">Explore Safaris</a>
+                <a href="#our-experiences" class="btn btn-light-brown btn-lg px-4 py-2 mt-2">Explore Safaris</a>
             </div>
         </div>
         {% empty %}
@@ -31,7 +34,7 @@
             <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100 z-2">
                 <h1 class="hero-title mb-1">Kaelo Tours & Travel</h1>
                 <p class="hero-subtitle mb-4">Unforgettable Journey Through the Heart of the Maasai Mara</p>
-                <a href="#" class="btn btn-light-brown btn-lg px-4 py-2 mt-2">Explore Safaris</a>
+                <a href="#our-experiences" class="btn btn-light-brown btn-lg px-4 py-2 mt-2">Explore Safaris</a>
             </div>
         </div>
         <div class="carousel-item h-100">
@@ -40,7 +43,7 @@
             <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100 z-2">
                 <h1 class="hero-title mb-1">Kaelo Tours & Travel</h1>
                 <p class="hero-subtitle mb-4">Unforgettable Journey Through the Heart of the Maasai Mara</p>
-                <a href="#" class="btn btn-light-brown btn-lg px-4 py-2 mt-2">Plan Your Trip</a>
+                <a href="#contact" class="btn btn-light-brown btn-lg px-4 py-2 mt-2">Plan Your Trip</a>
             </div>
         </div>
         <div class="carousel-item h-100">
@@ -49,7 +52,7 @@
             <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100 z-2">
                 <h1 class="hero-title mb-1">Kaelo Tours & Travel</h1>
                 <p class="hero-subtitle mb-4">Unforgettable Journey Through the Heart of the Maasai Mara</p>
-                <a href="#" class="btn btn-light-brown btn-lg px-4 py-2 mt-2">Discover More</a>
+                <a href="#our-story" class="btn btn-light-brown btn-lg px-4 py-2 mt-2">Discover More</a>
             </div>
         </div>
         {% endfor %}
