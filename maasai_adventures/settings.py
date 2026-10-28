@@ -131,7 +131,9 @@ CKEDITOR_5_CONFIGS = {
 
 
 # Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Set EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend locally to
+# print emails to the server log instead of sending them.
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
