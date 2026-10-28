@@ -263,6 +263,32 @@
             margin-right: -0.5rem;
         }
 
+        /* Hamburger that turns into an X while the menu is open (Bootstrap sets aria-expanded). */
+        .toggler-bars {
+            position: relative;
+            display: block;
+            width: 26px;
+            height: 18px;
+        }
+
+        .toggler-bars span {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            border-radius: 2px;
+            background-color: rgba(255, 255, 255, 0.85);
+            transition: transform 0.3s ease, opacity 0.2s ease, top 0.3s ease;
+        }
+
+        .toggler-bars span:nth-child(1) { top: 0; }
+        .toggler-bars span:nth-child(2) { top: 8px; }
+        .toggler-bars span:nth-child(3) { top: 16px; }
+
+        .navbar-toggler[aria-expanded="true"] .toggler-bars span:nth-child(1) { top: 8px; transform: rotate(45deg); }
+        .navbar-toggler[aria-expanded="true"] .toggler-bars span:nth-child(2) { opacity: 0; }
+        .navbar-toggler[aria-expanded="true"] .toggler-bars span:nth-child(3) { top: 8px; transform: rotate(-45deg); }
+
         @media (max-width: 991.98px) {
             .navbar-custom {
                 padding-top: 0.5rem;
@@ -446,7 +472,7 @@
             {% endif %}
 
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                <span class="toggler-bars" aria-hidden="true"><span></span><span></span><span></span></span>
             </button>
 
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
@@ -599,6 +625,9 @@
 
         // Close the mobile menu after picking a link that scrolls within the page.
         var menu = document.getElementById('navbarNav');
+        var toggler = document.querySelector('.navbar-toggler');
+        menu.addEventListener('show.bs.collapse', function () { toggler.setAttribute('aria-label', 'Close navigation'); });
+        menu.addEventListener('hide.bs.collapse', function () { toggler.setAttribute('aria-label', 'Toggle navigation'); });
         menu.addEventListener('click', function (event) {
             if (event.target.closest('a') && menu.classList.contains('show')) {
                 bootstrap.Collapse.getOrCreateInstance(menu).hide();
