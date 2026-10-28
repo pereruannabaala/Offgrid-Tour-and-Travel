@@ -2,95 +2,202 @@
 {% load responsive_images %}
 
 {% block content %}
-<div class="container py-5" style="font-family: 'Work Sans', sans-serif; min-height: 70vh;">
-  <div class="mb-4">
-    <a href="{% url 'shop_list' %}" class="text-decoration-none text-dark fw-bold">
-      <i class="fa-solid fa-arrow-left me-2"></i> Continue Shopping
-    </a>
-  </div>
+<style>
+.cart-section {
+  background-color: #F2ECDC;
+  color: #3A2E22;
+  font-family: 'Work Sans', sans-serif;
+  padding-bottom: 5rem;
+  min-height: 70vh;
+}
 
-  <h2 class="font-serif fw-bold text-dark mb-4">Your Shopping Cart</h2>
+.cart-title {
+  font-family: 'Fraunces', serif;
+  color: #22301F;
+}
 
-  {% if cart %}
-    <div class="table-responsive bg-white p-3 rounded shadow-sm border">
-      <table class="table align-middle mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Item</th>
-            <th>Image</th>
-            <th class="text-center">Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-            <th class="text-end">Action</th>
-          </tr>
-        </thead>
-        <tbody>
+.cart-panel {
+  background: #FFFFFF;
+  border: 1px solid #E5DEC9;
+  border-radius: 12px;
+}
+
+.cart-item + .cart-item {
+  border-top: 1px solid #EFE9DA;
+}
+
+.cart-item__img {
+  width: 80px;
+  height: 80px;
+  flex: 0 0 80px;
+  border-radius: 8px;
+  background: #FAF8F5;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-item__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cart-item__name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  color: #22301F;
+}
+
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #DCD5C3;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.qty-stepper button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #22301F;
+  font-weight: 700;
+}
+
+.qty-stepper button:hover {
+  background: #F2ECDC;
+}
+
+.qty-stepper span {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.cart-remove {
+  color: #9A8F7E;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.cart-remove:hover {
+  color: #B44C4C;
+}
+
+.btn-bush {
+  background-color: #22301F;
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-bush:hover {
+  background-color: #2F4229;
+  color: #FFFFFF;
+}
+
+@media (min-width: 992px) {
+  .cart-summary { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+}
+</style>
+
+<section class="cart-section pt-nav">
+  <div class="container">
+    <div class="mb-4">
+      <a href="{% url 'shop_list' %}" class="text-decoration-none text-dark fw-bold">
+        <i class="fa-solid fa-arrow-left me-2"></i> Continue Shopping
+      </a>
+    </div>
+
+    <h1 class="cart-title h2 mb-4">Your Cart</h1>
+
+    {% if cart %}
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="cart-panel px-3 px-sm-4">
           {% for item in cart %}
-          <tr>
-            <td>
-              <span class="fw-bold d-block text-dark">
-                {{ item.product_name }} 
-                {% if item.variant_name %}
-                  <span class="text-muted">({{ item.variant_name }})</span>
-                {% endif %}
-              </span>
-              {% if item.variant %}
-                <small class="text-muted">Stock available: {{ item.variant.stock }}</small>
-              {% else %}
-                <small class="text-muted">Stock available: {{ item.product.stock }}</small>
-              {% endif %}
-            </td>
-            <td>
+          <div class="cart-item d-flex gap-3 py-3 py-sm-4">
+            <div class="cart-item__img">
               {% if item.image %}
-                {% responsive_image item.image sizes="50px" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: #FAF8F5;" %}
+                {% responsive_image item.image sizes="80px" alt=item.product_name %}
               {% else %}
-                <span class="text-muted small">No Image</span>
+                <i class="fa-solid fa-image text-muted"></i>
               {% endif %}
-            </td>
-            <td>
-              <!-- Quantity adjustment buttons (+ and -) -->
-              <div class="d-flex justify-content-center align-items-center gap-2">
-                <form action="{% url 'cart_update' item.product.id %}" method="POST" class="d-inline">
-                  {% csrf_token %}
-                  <input type="hidden" name="variant_id" value="{% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}">
-                  <input type="hidden" name="action" value="decrease">
-                  <button type="submit" class="btn btn-outline-secondary btn-sm px-2 py-0 fw-bold">-</button>
-                </form>
+            </div>
 
-                <span class="fw-bold px-2">{{ item.quantity }}</span>
-
-                <form action="{% url 'cart_update' item.product.id %}" method="POST" class="d-inline">
-                  {% csrf_token %}
-                  <input type="hidden" name="variant_id" value="{% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}">
-                  <input type="hidden" name="action" value="increase">
-                  <button type="submit" class="btn btn-outline-secondary btn-sm px-2 py-0 fw-bold">+</button>
-                </form>
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <div>
+                  <div class="cart-item__name lh-sm">{{ item.product_name }}</div>
+                  <small class="text-muted">
+                    {% if item.variant_name %}{{ item.variant_name }} &middot; {% endif %}${{ item.price }} each
+                  </small>
+                </div>
+                <span class="fw-bold text-nowrap">${{ item.total_price }}</span>
               </div>
-            </td>
-            <td>${{ item.price }}</td>
-            <td class="fw-bold">${{ item.total_price }}</td>
-            <td class="text-end">
-              <a href="{% url 'cart_remove' item.product.id %}?variant_id={% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}" class="btn btn-outline-danger btn-sm">
-                <i class="fa-solid fa-trash"></i>
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
 
-    <div class="d-flex justify-content-between align-items-center mt-4 p-4 bg-white border rounded shadow-sm">
-      <h4 class="fw-bold mb-0 text-dark">Total: ${{ cart.get_total_price }}</h4>
-     
-      <a href="{% url 'guest_checkout' %}" class="btn btn-dark px-5 py-3 fw-bold">Proceed to Checkout</a>
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="qty-stepper">
+                  <form action="{% url 'cart_update' item.product.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="variant_id" value="{% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}">
+                    <input type="hidden" name="action" value="decrease">
+                    <button type="submit" aria-label="Decrease quantity">&minus;</button>
+                  </form>
+                  <span>{{ item.quantity }}</span>
+                  <form action="{% url 'cart_update' item.product.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="variant_id" value="{% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}">
+                    <input type="hidden" name="action" value="increase">
+                    <button type="submit" aria-label="Increase quantity">+</button>
+                  </form>
+                </div>
+
+                <a href="{% url 'cart_remove' item.product.id %}?variant_id={% if item.variant %}{{ item.variant.id }}{% else %}None{% endif %}" class="cart-remove">
+                  <i class="fa-solid fa-trash-can me-1"></i> Remove
+                </a>
+              </div>
+
+              <small class="text-muted d-block mt-2">
+                {% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %} in stock
+              </small>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="cart-panel cart-summary p-4">
+          <h2 class="cart-title h5 mb-3">Order Summary</h2>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Subtotal</span>
+            <span>${{ cart.get_total_price }}</span>
+          </div>
+          <div class="d-flex justify-content-between pb-3 mb-3 border-bottom">
+            <span class="text-muted">Delivery</span>
+            <span class="text-muted small">Chosen at checkout</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-baseline mb-4">
+            <span class="fw-bold">Total</span>
+            <span class="fs-4 fw-bold" style="color: #22301F;">${{ cart.get_total_price }}</span>
+          </div>
+          <a href="{% url 'guest_checkout' %}" class="btn btn-bush btn-lg w-100 fw-bold py-3">
+            Checkout <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
     </div>
-  {% else %}
-    <div class="text-center py-5 bg-white rounded border shadow-sm">
-      <p class="fs-5 text-muted mb-3">Your shopping cart is currently empty.</p>
-      <a href="{% url 'shop_list' %}" class="btn btn-dark px-4 py-2 fw-bold">Explore the Souvenir Shop</a>
+    {% else %}
+    <div class="cart-panel text-center py-5 px-4">
+      <i class="fa-solid fa-bag-shopping fs-1 mb-3" style="color: #B4924F;"></i>
+      <p class="fs-5 text-muted mb-4">Your cart is empty.</p>
+      <a href="{% url 'shop_list' %}" class="btn btn-bush px-4 py-2 fw-bold">Explore the Souvenir Shop</a>
     </div>
-  {% endif %}
-</div>
+    {% endif %}
+  </div>
+</section>
 {% include 'tours/contact.html' %}
 {% endblock %}

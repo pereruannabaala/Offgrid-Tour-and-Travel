@@ -7,7 +7,7 @@
   background-color: #F2ECDC;
   color: #3A2E22;
   font-family: 'Work Sans', sans-serif;
-  padding: 5rem 1.5rem;
+  padding: 0 0 5rem;
   min-height: 80vh;
 }
 
@@ -85,6 +85,52 @@
   color: #D1C7B7 !important;
 }
 
+.variant-radio:checked + label .variant-option-card .text-dark {
+  color: #FFFFFF !important;
+}
+
+.variant-radio:focus-visible + label .variant-option-card {
+  outline: 2px solid #B4924F;
+  outline-offset: 2px;
+}
+
+.variant-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+@media (max-width: 575.98px) {
+  .detail-img-container { height: 320px; }
+  .product-title { font-size: 1.75rem; }
+  .variant-option-card { padding: 0.75rem; }
+  .variant-thumb { width: 44px; height: 44px; }
+}
+
+@media (max-width: 374.98px) {
+  .variant-option-card small { font-size: 0.72rem; }
+}
+
+/* Touch screens get a permanent zoom hint instead of the hover label. */
+@media (hover: none) {
+  .detail-img-container:hover::after { content: none; }
+  .zoom-hint { display: inline-flex !important; }
+}
+
+.zoom-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(34, 48, 31, 0.8);
+  color: #fff;
+  font-size: 0.85rem;
+}
+
 /* Variant thumbnail hover effect */
 .variant-thumb {
   width: 50px; 
@@ -100,8 +146,7 @@
 }
 </style>
 
-<br>
-<section class="product-detail-section">
+<section class="product-detail-section pt-nav">
   <div class="container">
     <div class="mb-4">
       <a href="{% url 'shop_list' %}" class="text-decoration-none text-dark fw-bold">
@@ -109,13 +154,15 @@
       </a>
     </div>
 
-    <div class="row g-5 align-items-center detail-card p-4 p-lg-5">
+    <div class="detail-card p-3 p-sm-4 p-lg-5">
+    <div class="row g-4 g-lg-5 align-items-center">
       <!-- Product Image Column (Clickable to Zoom Modal) -->
       <div class="col-lg-6">
         {% image_renditions product.image as zoom %}
         <div class="detail-img-container rounded" {% if product.image %}data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImageModal(this)" data-title="{{ product.name }}" data-src="{{ zoom.large }}" data-srcset="{{ zoom.fallback_srcset }}" data-webp-srcset="{{ zoom.webp_srcset }}"{% endif %}>
           {% if product.image %}
             {% responsive_image product.image sizes="(min-width: 1400px) 600px, (min-width: 992px) 45vw, 100vw" alt=product.name loading="eager" fetchpriority="high" class="detail-img" id="mainProductImg" %}
+            <span class="zoom-hint d-none" aria-hidden="true"><i class="fa-solid fa-expand"></i></span>
           {% else %}
             <span class="text-muted">No Image Available</span>
           {% endif %}
@@ -124,11 +171,11 @@
 
       <!-- Product Info & Versions Column -->
       <div class="col-lg-6">
-        <h1 class="product-title mb-3">{{ product.name }}</h1>
-        
-        <div class="mb-4">
+        <h1 class="product-title mb-2">{{ product.name }}</h1>
+
+        <div class="mb-4 d-flex flex-wrap align-items-baseline column-gap-2">
           <span class="price-tag">${{ product.price_usd }}</span>
-          <span class="text-muted fs-6 ms-2">(Base Price / KES {{ product.price_kes }})</span>
+          <span class="text-muted small">KES {{ product.price_kes }}</span>
         </div>
 
         <form action="{% url 'cart_add' product.id %}" method="POST" id="add-to-cart-form">
@@ -136,13 +183,13 @@
 
           {% if product.variants.all %}
           <div class="mb-4">
-            <label class="form-label fw-bold text-dark mb-3">Available Sizes / Versions:</label>
-            <div class="d-flex flex-column gap-3">
+            <label class="form-label small text-uppercase fw-bold text-muted letter-spacing-1 mb-3">Choose a size</label>
+            <div class="d-flex flex-column gap-2 gap-sm-3">
               {% for variant in product.variants.all %}
               <div>
                 <input type="radio" id="variant-{{ variant.id }}" name="variant_id" value="{{ variant.id }}" class="d-none variant-radio" {% if variant.stock > 0 and forloop.first %}checked{% endif %} {% if variant.stock <= 0 %}disabled{% endif %}>
                 <label for="variant-{{ variant.id }}" class="d-block w-100 {% if variant.stock <= 0 %}opacity-50 cursor-not-allowed{% endif %}">
-                  <div class="variant-option-card d-flex justify-content-between align-items-center" id="card-{{ variant.id }}">
+                  <div class="variant-option-card d-flex justify-content-between align-items-center gap-2" id="card-{{ variant.id }}">
                     <div class="d-flex align-items-center gap-3">
                       {% if variant.image %}
                         {% image_renditions variant.image as zoom %}
@@ -151,15 +198,15 @@
                         </span>
                       {% endif %}
                       <div>
-                        <h5 class="fw-bold mb-0">{{ variant.name }}</h5>
+                        <span class="variant-name d-block lh-sm">{{ variant.name }}</span>
                         {% if variant.stock > 0 %}
-                          <small class="text-muted">In Stock ({{ variant.stock }} left)</small>
+                          <small class="text-muted text-nowrap">{{ variant.stock }} in stock</small>
                         {% else %}
-                          <small class="text-danger fw-bold">Out of Stock</small>
+                          <small class="text-danger fw-bold text-nowrap">Out of stock</small>
                         {% endif %}
                       </div>
                     </div>
-                    <div class="text-end">
+                    <div class="text-end text-nowrap">
                       <span class="fw-bold text-dark">${{ variant.get_price_usd }}</span>
                       <small class="text-muted d-block">KES {{ variant.get_price_kes }}</small>
                     </div>
@@ -171,7 +218,7 @@
           </div>
 
           <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold py-3">
-            <i class="fa-solid fa-cart-plus me-2"></i> Add Selected Version to Cart
+            <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
           </button>
           
           {% else %}
@@ -188,6 +235,7 @@
           {% endif %}
         </form>
       </div>
+    </div>
     </div>
   </div>
 </section>

@@ -7,10 +7,11 @@
     <title>Kaelo Expeditions LTD</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts: Playfair Display, Lato & Alex Brush -->
+    <!-- Google Fonts: Playfair Display, Lato & Alex Brush, plus Fraunces, Work Sans & Great Vibes
+         for the gallery, blog and shop pages. Browsers only download the families a page uses. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Great+Vibes&family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -23,11 +24,21 @@
             --earth-border: #e2dacd;      /* Subtle organic borders */
             --brand-dark: #0b0f19;        /* Hero background */
             --brand-accent: #cadb7b;      /* Hero highlight */
+            --nav-h: 82px;                /* height of the fixed navbar */
+        }
+
+        @media (max-width: 991.98px) {
+            :root { --nav-h: 66px; }
         }
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 90px; /* keep in-page anchor targets clear of the fixed navbar */
+            scroll-padding-top: calc(var(--nav-h) + 8px); /* keep in-page anchor targets clear of the fixed navbar */
+        }
+
+        /* Wide CMS content (blog tables, embeds) must never make the page scroll sideways. */
+        html, body {
+            overflow-x: clip;
         }
 
         body {
@@ -36,6 +47,17 @@
             color: #ffffff;
             line-height: 1.6;
         }
+
+        /* Phones: give text room to breathe (Bootstrap's default is a 12px side gutter). */
+        @media (max-width: 575.98px) {
+            .container, .container-fluid { --bs-gutter-x: 2.5rem; }
+        }
+
+        .letter-spacing-1 { letter-spacing: 1px; }
+        .letter-spacing-2 { letter-spacing: 2.5px; }
+
+        /* Top padding for pages that start without a hero image, so the fixed navbar doesn't cover them. */
+        .pt-nav { padding-top: calc(var(--nav-h) + 2.5rem) !important; }
 
         h1, h2, h3, h4, h5, .font-serif {
             font-family: 'Playfair Display', serif;
@@ -203,6 +225,207 @@
         .carousel-fade .carousel-item {
             transition-duration: 0.8s;
         }
+
+        /* Inner-page hero banners (Meet the Tribe, Chronicles) */
+        .page-hero {
+            min-height: 650px;
+            background-color: #2c221e;
+        }
+
+        /* Hover lifts only on devices that can hover, so taps don't leave cards stuck "raised". */
+        @media (hover: none) {
+            .earth-img-frame:hover { transform: none; box-shadow: 0 12px 30px rgba(44, 34, 30, 0.08); }
+        }
+
+        /* ---------- Mobile navigation ---------- */
+        .nav-cart-mobile {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            color: #ffffff;
+            font-size: 1.15rem;
+            text-decoration: none;
+        }
+
+        .nav-cart-mobile .badge {
+            position: absolute;
+            top: 4px;
+            right: 2px;
+            font-size: 0.6rem;
+            background-color: var(--earth-terracotta);
+        }
+
+        .navbar-custom .navbar-toggler {
+            padding: 0.5rem;
+            margin-right: -0.5rem;
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-custom {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            /* Solid panel while the menu is open, so links stay readable over the hero. */
+            .navbar-custom:has(.navbar-collapse.show, .navbar-collapse.collapsing) {
+                background: rgba(11, 15, 25, 0.97);
+            }
+
+            .navbar-custom .navbar-collapse {
+                max-height: calc(100svh - var(--nav-h));
+                overflow-y: auto;
+            }
+
+            .navbar-custom .navbar-nav {
+                padding-bottom: 0.5rem;
+            }
+
+            .navbar-custom .nav-link {
+                padding: 0.95rem 0;
+                font-size: 0.85rem;
+                border-bottom: 1px solid rgba(226, 218, 205, 0.08);
+            }
+
+            .navbar-custom .nav-link::after { display: none; }
+            .navbar-custom .nav-link.active { color: var(--brand-accent) !important; }
+
+            .navbar-custom .nav-cta {
+                margin-top: 1rem;
+            }
+
+            .navbar-custom .nav-cta .btn {
+                display: block;
+                width: 100%;
+                padding: 0.85rem 1rem !important;
+            }
+
+            .navbar-custom .nav-cta .badge {
+                position: static !important;
+                transform: none !important;
+                margin-left: 0.35rem;
+            }
+        }
+
+        /* ---------- Phones ---------- */
+        @media (max-width: 767.98px) {
+            .hero-carousel,
+            .hero-carousel .carousel-item {
+                height: 92vh;
+                height: 92svh;
+                min-height: 540px;
+            }
+
+            .hero-carousel .carousel-caption {
+                left: 1.25rem;
+                right: 1.25rem;
+                padding-top: var(--nav-h);
+            }
+
+            .hero-title {
+                font-size: clamp(2.25rem, 10vw, 3rem);
+                line-height: 1.1;
+                margin-bottom: 0.75rem !important;
+            }
+
+            .hero-subtitle {
+                font-size: clamp(1.6rem, 7vw, 2rem);
+            }
+
+            /* Phones swipe the carousel; the edge arrows are too small to tap. */
+            .hero-carousel .carousel-control-prev,
+            .hero-carousel .carousel-control-next {
+                display: none;
+            }
+
+            .page-hero {
+                min-height: max(440px, 64svh);
+                padding-top: var(--nav-h);
+            }
+
+            section h2.display-4 {
+                font-size: 2.25rem;
+            }
+        }
+
+        /* ---------- Dark forms (safari inquiry) ---------- */
+        .form-dark .form-control,
+        .form-dark .form-select {
+            min-height: 48px;
+            border-color: rgba(226, 218, 205, 0.3) !important;
+        }
+
+        .form-dark .form-control::placeholder {
+            color: rgba(226, 218, 205, 0.45);
+        }
+
+        .form-dark .form-control:focus,
+        .form-dark .form-select:focus {
+            border-color: var(--earth-terracotta) !important;
+            box-shadow: 0 0 0 0.2rem rgba(166, 93, 55, 0.25);
+        }
+
+        /* ---------- Footer ---------- */
+        .site-footer {
+            background-color: #1a1411;
+            color: rgba(226, 218, 205, 0.7);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(226, 218, 205, 0.08);
+        }
+
+        .site-footer a {
+            color: rgba(226, 218, 205, 0.8);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .site-footer a:hover {
+            color: #ffffff;
+        }
+
+        .site-footer h6 {
+            font-family: 'Lato', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--earth-terracotta);
+            margin-bottom: 1rem;
+        }
+
+        .site-footer img {
+            mix-blend-mode: luminosity;
+            filter: brightness(1.1) contrast(1.1);
+        }
+
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.6rem 1.5rem;
+        }
+
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(226, 218, 205, 0.2);
+            border-radius: 50%;
+        }
+
+        .footer-social a:hover {
+            border-color: var(--brand-accent);
+            color: var(--brand-accent);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(226, 218, 205, 0.08);
+            font-size: 0.8rem;
+            color: rgba(226, 218, 205, 0.5);
+        }
     </style>
 </head>
 <body{% block body_attrs %}{% endblock %}>
@@ -214,6 +437,13 @@
             <a class="navbar-brand d-flex align-items-center text-decoration-none" href="{% url 'index' %}">
                 <img src="{% static 'images/logo.jpeg' %}" alt="Kaelo Expeditions Logo" height="40" class="d-inline-block align-text-top rounded">
             </a>
+
+            {% if shop_enabled and cart_item_count > 0 %}
+            <a class="nav-cart-mobile d-lg-none ms-auto me-1" href="{% url 'cart_detail' %}" aria-label="Cart ({{ cart_item_count }} items)">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span class="badge rounded-pill">{{ cart_item_count }}</span>
+            </a>
+            {% endif %}
 
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -257,7 +487,7 @@
                     </li>
                     
                     {% if shop_enabled %}
-                    <li class="nav-item ms-lg-2">
+                    <li class="nav-item nav-cta ms-lg-2">
                         <a class="btn btn-light-brown btn-sm rounded-pill px-3 py-2 fw-bold {% if request.resolver_match.url_name == 'shop_list' %}active{% endif %}" 
                         href="{% url 'shop_list' %}">
                             <i class="fa-solid fa-bag-shopping me-1"></i> Shop
@@ -266,7 +496,7 @@
                     {% endif %}
 
                     {% if shop_enabled and cart_item_count > 0 %}
-                    <li class="nav-item">
+                    <li class="nav-item nav-cta mt-lg-0">
                         <a class="btn btn-dark btn-sm rounded-pill px-3 py-2 fw-bold position-relative border border-secondary border-opacity-50" href="{% url 'cart_detail' %}">
                             <i class="fa-solid fa-cart-shopping me-1"></i> Cart
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
@@ -277,7 +507,7 @@
                     {% endif %}
 
                     {% if user.is_superuser %}
-                    <li class="nav-item">
+                    <li class="nav-item nav-cta">
                         <a class="btn btn-warning btn-sm rounded-pill px-3 py-2 fw-bold {% if request.resolver_match.url_name == 'admin_upload' %}active{% endif %}" 
                         href="{% url 'admin_upload' %}">
                             <i class="fa-solid fa-cloud-arrow-up me-1"></i> Admin
@@ -290,6 +520,55 @@
     </nav>
 
     {% block content %}{% endblock %}
+
+    <footer class="site-footer">
+        <div class="container py-5">
+            <div class="row g-4 g-lg-5">
+                <div class="col-lg-5">
+                    <a href="{% url 'index' %}" class="d-inline-block mb-3">
+                        <img src="{% static 'images/logo.jpeg' %}" alt="Kaelo Expeditions" height="44" class="rounded">
+                    </a>
+                    <p class="mb-4" style="max-width: 360px;">
+                        Private, expertly guided safaris across East Africa's wildest landscapes, rooted in Maasai heritage.
+                    </p>
+                    <div class="footer-social d-flex gap-2">
+                        <a href="https://instagram.com/Kaelomaasai" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://facebook.com/Kaelomaasai" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://wa.me/254725352358" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="mailto:kaeloexpeditions@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <h6>Explore</h6>
+                    <div class="footer-links">
+                        <a href="{% url 'index' %}#our-story">Our Story</a>
+                        <a href="{% url 'index' %}#our-experiences">Experiences</a>
+                        <a href="{% url 'meet_the_tribe' %}">The Tribe</a>
+                        <a href="{% url 'expedition_gallery' %}">Gallery</a>
+                        <a href="{% url 'blog_list' %}">Chronicles</a>
+                        {% if shop_enabled %}<a href="{% url 'shop_list' %}">Shop</a>{% endif %}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <h6>Get in Touch</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                        <li><a href="mailto:kaeloexpeditions@gmail.com" class="text-break">kaeloexpeditions@gmail.com</a></li>
+                        <li><a href="tel:+254725352358">+254 725 352 358</a></li>
+                        <li><a href="tel:+19803302946">+1 (980) 330-2946</a></li>
+                        <li><a href="{% url 'index' %}#contact">Plan your safari &rarr;</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container py-3 d-flex flex-column flex-sm-row justify-content-between gap-1 text-center text-sm-start">
+                <span>&copy; {% now "Y" %} Kaelo Expeditions Limited</span>
+                <span>Private Safaris &bull; East Africa</span>
+            </div>
+        </div>
+    </footer>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

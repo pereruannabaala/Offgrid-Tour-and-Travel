@@ -5,7 +5,6 @@
 
 <!-- Embedded Styles for Expedition Gallery -->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Work+Sans:wght@400;500;600&display=swap');
 
 .expedition-gallery {
   --bush: #22301F;
@@ -30,7 +29,7 @@
 .eg-hero {
   max-width: 760px;
   margin: 0 auto;
-  padding: 5.5rem 1.5rem 3rem;
+  padding: calc(var(--nav-h) + 3.5rem) 1.5rem 3rem;
   text-align: left;
 }
 
@@ -110,9 +109,57 @@
   .eg-grid { column-count: 2; }
 }
 
+/* Phones: a tight two-column contact sheet, filters as a swipeable chip row,
+   captions left to the lightbox (there is no hover to reveal them). */
 @media (max-width: 560px) {
-  .eg-grid { column-count: 1; }
-  .eg-hero { padding-top: 3.5rem; }
+  .eg-hero { padding: calc(var(--nav-h) + 2rem) 1.25rem 2rem; }
+  .eg-hero__dek { font-size: 1.1rem; }
+
+  .eg-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 0 1.25rem 1.25rem;
+    scrollbar-width: none;
+  }
+  .eg-filters::-webkit-scrollbar { display: none; }
+
+  .eg-filter {
+    flex: 0 0 auto;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(58, 46, 34, 0.2);
+    border-radius: 999px;
+    opacity: 0.75;
+  }
+  .eg-filter.is-active {
+    background: var(--bush);
+    border-color: var(--bush);
+    color: var(--parchment);
+  }
+
+  .eg-grid {
+    column-count: 2;
+    column-gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding: 0 0.75rem;
+  }
+  .eg-item {
+    margin-bottom: 0.6rem;
+    border: none;
+    border-radius: 6px;
+  }
+  .eg-item__caption { display: none; }
+
+  .eg-lightbox { padding: 1rem; }
+  .eg-lightbox__figure img { max-width: 100%; }
+  .eg-lightbox__close { top: 1rem; right: 1rem; padding: 0.5rem; }
+  .eg-lightbox__prev,
+  .eg-lightbox__next {
+    top: auto;
+    bottom: 1rem;
+    transform: none;
+  }
+  .eg-lightbox__count { bottom: 1.85rem; }
 }
 
 .eg-item {
@@ -289,7 +336,7 @@
     {% for photo in photos %}
     <figure class="eg-item" data-category="{{ photo.category }}" data-caption="{{ photo.caption }}{% if photo.place %} — {{ photo.place }}{% endif %}">
       {% image_renditions photo.image as full %}
-      {% responsive_image photo.thumb sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 380px" alt=photo.caption data_full=full.large data_full_srcset=full.fallback_srcset data_full_webp=full.webp_srcset %}
+      {% responsive_image photo.thumb sizes="(max-width: 900px) 50vw, 380px" alt=photo.caption data_full=full.large data_full_srcset=full.fallback_srcset data_full_webp=full.webp_srcset %}
       <figcaption class="eg-item__caption">
         <p class="eg-item__caption-title">{{ photo.caption }}</p>
         {% if photo.place %}
@@ -407,6 +454,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   lightbox.addEventListener('click', function (e) {
     if (e.target === lightbox) closeLightbox();
+  });
+
+  // Swipe left/right to step through photos on touch screens.
+  let touchStartX = null;
+  lightbox.addEventListener('touchstart', function (e) {
+    touchStartX = e.changedTouches[0].clientX;
+  }, { passive: true });
+  lightbox.addEventListener('touchend', function (e) {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    touchStartX = null;
+    if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
   });
 
   document.addEventListener('keydown', function (e) {

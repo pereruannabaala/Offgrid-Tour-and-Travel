@@ -124,10 +124,28 @@
   border-collapse: collapse;
 }
 
-.article-body th, 
+.article-body th,
 .article-body td {
   padding: 0.75rem;
   border: 1px solid #dcd5c3;
+}
+
+.article-body iframe,
+.article-body video {
+  max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .article-section { padding: calc(var(--nav-h) + 2.5rem) 1.25rem 4rem; }
+  .article-header { margin-bottom: 2rem; }
+  .article-hero-img { margin-bottom: 2rem; border-radius: 6px; }
+  .article-body { font-size: 1.05rem; line-height: 1.75; }
+  .article-body h2 { font-size: 1.6rem; }
+  .article-body h3 { font-size: 1.35rem; }
+  .article-body ul,
+  .article-body ol { padding-left: 1.25rem; }
+  /* Wide tables scroll inside the article instead of stretching the page. */
+  .article-body table { display: block; overflow-x: auto; }
 }
 </style>
 

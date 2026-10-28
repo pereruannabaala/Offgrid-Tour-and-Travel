@@ -5,16 +5,16 @@
 {% block contact_href %}{% url 'index' %}#contact{% endblock %}
 
 {% block content %}
-<section class="py-5" style="background-color: #F2ECDC; min-height: 80vh;">
+<section class="pt-nav pb-5" style="background-color: #F2ECDC; min-height: 80vh; color: #3A2E22;">
   <div class="container" style="max-width: 800px;">
     
-    <div class="card border-0 shadow-sm p-4 mb-4">
-      <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+    <div class="card border-0 shadow-sm p-3 p-sm-4 mb-4 rounded-3">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 border-bottom pb-3 mb-3">
         <div>
           <h3 class="font-serif mb-1 text-dark">Order #{{ order.id }}</h3>
-          <p class="text-muted mb-0"><small>Tracking Token: {{ order.tracking_token }}</small></p>
+          <p class="text-muted mb-0 text-break"><small>Tracking: {{ order.tracking_token }}</small></p>
         </div>
-        <div class="text-end">
+        <div>
           <div id="payment-status-badge">
             {% if order.payment_status == 'paid' %}
               <span class="badge bg-success fs-6">Paid</span>
@@ -54,7 +54,7 @@
         {% endif %}
       </div>
 
-      <div class="row mb-4">
+      <div class="row g-3 mb-4">
         <div class="col-md-6">
           <h6 class="fw-bold text-uppercase text-muted small">Customer Details</h6>
           <p class="mb-1"><strong>Name:</strong> {{ order.full_name }}</p>
@@ -80,7 +80,7 @@
             <tr>
               <th scope="col">Product</th>
               <th scope="col" class="text-center">Qty</th>
-              <th scope="col" class="text-end">Price</th>
+              <th scope="col" class="text-end d-none d-sm-table-cell">Price</th>
               <th scope="col" class="text-end">Total</th>
             </tr>
           </thead>
@@ -96,15 +96,15 @@
                 </div>
               </td>
               <td class="text-center">{{ item.quantity }}</td>
-              <td class="text-end">${{ item.price }}</td>
-              <td class="text-end fw-bold">${{ item.get_cost }}</td>
+              <td class="text-end d-none d-sm-table-cell">${{ item.price }}</td>
+              <td class="text-end fw-bold">${{ item.get_total }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
 
-      <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
+      <div class="d-flex flex-wrap-reverse justify-content-between align-items-center gap-3 border-top pt-3 mt-3">
         {% if shop_enabled %}
         <a href="{% url 'shop_list' %}" class="btn btn-outline-dark btn-sm">
           <i class="fa-solid fa-arrow-left me-1"></i> Return to Shop

@@ -7,7 +7,7 @@
   background-color: #F2ECDC;
   color: #3A2E22;
   font-family: 'Work Sans', sans-serif;
-  padding: 5rem 1.5rem;
+  padding: 0 0 5rem;
 }
 
 .product-card {
@@ -59,6 +59,11 @@
 }
 
 /* Out of Stock Image Overlay Badge */
+@media (max-width: 575.98px) {
+  .product-img-container { height: 240px; }
+  .product-title { font-size: 1.25rem; }
+}
+
 .out-of-stock-badge {
   position: absolute;
   top: 12px;
@@ -74,10 +79,9 @@
 }
 </style>
 
-<section class="shop-section">
+<section class="shop-section pt-nav">
   <div class="container">
     <div class="text-center mb-5">
-      <br>
       <span class="text-uppercase tracking-wider text-muted small fw-bold">Authentic Maasai Crafts</span>
       <h1 class="font-serif display-5 fw-bold text-dark mt-1">Souvenir Shop</h1>
       <p class="text-muted mx-auto" style="max-width: 600px;">

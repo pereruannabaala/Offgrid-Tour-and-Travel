@@ -1,108 +1,300 @@
 {% extends 'tours/base.html' %}
+{% load responsive_images %}
 
 {# This page has no contact section; send the navbar link to the home page's. #}
 {% block contact_href %}{% url 'index' %}#contact{% endblock %}
 
 {% block content %}
-<div class="container py-5" style="max-width: 800px;">
-  <h2 class="font-serif mb-4">Guest Checkout</h2>
+<style>
+.checkout-section {
+  background-color: #F2ECDC;
+  color: #3A2E22;
+  font-family: 'Work Sans', sans-serif;
+  padding-bottom: 5rem;
+  min-height: 80vh;
+}
 
-  <form method="POST">
-    {% csrf_token %}
-    
-    <!-- Delivery Selection -->
-    <div class="card mb-4 p-3 bg-light border-0 shadow-sm">
-      <h5 class="fw-bold mb-3">Delivery Destination</h5>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="delivery_type" id="deliveryHome" value="home" checked onclick="toggleDelivery('home')">
-        <label class="form-check-label" for="deliveryHome">Ship to Home / International</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="delivery_type" id="deliveryHotel" value="hotel" onclick="toggleDelivery('hotel')">
-        <label class="form-check-label" for="deliveryHotel">Ship to Hotel / Airbnb in Kenya</label>
-      </div>
+.checkout-title {
+  font-family: 'Fraunces', serif;
+  color: #22301F;
+}
+
+.checkout-panel {
+  background: #FFFFFF;
+  border: 1px solid #E5DEC9;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+@media (min-width: 576px) {
+  .checkout-panel { padding: 1.75rem; }
+}
+
+.checkout-step {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  color: #22301F;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.checkout-step span {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #22301F;
+  color: #F2ECDC;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkout-section .form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3A2E22;
+}
+
+.checkout-section .form-control {
+  min-height: 48px;
+  border-color: #DCD5C3;
+}
+
+.checkout-section .form-control:focus {
+  border-color: #B4924F;
+  box-shadow: 0 0 0 0.2rem rgba(180, 146, 79, 0.2);
+}
+
+/* Big tappable option tiles for delivery and payment choices */
+.option-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #DCD5C3;
+  border-radius: 10px;
+  cursor: pointer;
+  height: 100%;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.option-tile .form-check-input {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.option-tile:has(.form-check-input:checked) {
+  border-color: #22301F;
+  background-color: #FAF8F5;
+  box-shadow: inset 0 0 0 1px #22301F;
+}
+
+.option-tile .form-check-input:checked {
+  background-color: #22301F;
+  border-color: #22301F;
+}
+
+.option-tile small {
+  display: block;
+  color: #8A8173;
+}
+
+.summary-item__img {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 8px;
+  background: #FAF8F5;
+  overflow: hidden;
+  position: relative;
+}
+
+.summary-item__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.summary-item__qty {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #22301F;
+  color: #fff;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-bush {
+  background-color: #22301F;
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-bush:hover {
+  background-color: #2F4229;
+  color: #FFFFFF;
+}
+
+@media (min-width: 992px) {
+  .checkout-summary { position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+}
+</style>
+
+<section class="checkout-section pt-nav">
+  <div class="container" style="max-width: 1080px;">
+    <div class="mb-4">
+      <a href="{% url 'cart_detail' %}" class="text-decoration-none text-dark fw-bold">
+        <i class="fa-solid fa-arrow-left me-2"></i> Back to Cart
+      </a>
     </div>
 
-    <!-- Contact & Shipping Information -->
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Full Name *</label>
-        <input type="text" name="full_name" class="form-control" required>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Email (For Receipt & Tracking) *</label>
-        <input type="email" name="email" class="form-control" required>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Phone / WhatsApp *</label>
-        <input type="tel" name="phone" class="form-control" placeholder="+254 7XX XXX XXX" required>
-      </div>
+    <h1 class="checkout-title h2 mb-4">Checkout</h1>
 
-      <!-- Hotel Fields (Hidden by default) -->
-      <div id="hotelFields" class="row g-3 d-none mt-1">
-        <div class="col-md-8">
-          <label class="form-label">Hotel / Safari Lodge Name *</label>
-          <input type="text" name="hotel_name" id="hotel_name" class="form-control" placeholder="e.g. Mara Serena Safari Lodge">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Room / Booking #</label>
-          <input type="text" name="room_number" class="form-control" placeholder="e.g. Room 104">
-        </div>
-      </div>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="row g-4">
 
-      <!-- Home Address Fields -->
-      <div id="homeFields" class="row g-3 mt-1">
-        <div class="col-12">
-          <label class="form-label">Address / Street *</label>
-          <input type="text" name="address_line_1" id="address_line_1" class="form-control" required>
+        <!-- Order summary: first on phones so the total is visible up front -->
+        <div class="col-lg-5 order-lg-2">
+          <div class="checkout-panel checkout-summary">
+            <h2 class="checkout-title h5 mb-3">Order Summary</h2>
+            {% for item in cart %}
+            <div class="d-flex align-items-center gap-3 {% if not forloop.last %}mb-3{% endif %}">
+              <div class="summary-item__img">
+                {% if item.image %}{% responsive_image item.image sizes="52px" alt=item.product_name %}{% endif %}
+                <span class="summary-item__qty">{{ item.quantity }}</span>
+              </div>
+              <div class="flex-grow-1 lh-sm">
+                <div class="fw-semibold">{{ item.product_name }}</div>
+                {% if item.variant_name %}<small class="text-muted">{{ item.variant_name }}</small>{% endif %}
+              </div>
+              <span class="fw-semibold text-nowrap">${{ item.total_price }}</span>
+            </div>
+            {% endfor %}
+            <div class="d-flex justify-content-between align-items-baseline border-top pt-3 mt-3">
+              <span class="fw-bold">Total</span>
+              <span class="fs-4 fw-bold" style="color: #22301F;">${{ cart.get_total_price }}</span>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">City *</label>
-          <input type="text" name="city" id="city" class="form-control" required>
+
+        <div class="col-lg-7 order-lg-1 d-flex flex-column gap-4">
+
+          <!-- Delivery Selection -->
+          <div class="checkout-panel">
+            <h2 class="checkout-step"><span>1</span> Delivery</h2>
+            <div class="row g-2 g-sm-3">
+              <div class="col-sm-6">
+                <label class="option-tile" for="deliveryHome">
+                  <input class="form-check-input" type="radio" name="delivery_type" id="deliveryHome" value="home" checked onclick="toggleDelivery('home')">
+                  <span><strong>Home / International</strong><small>Ship to your address</small></span>
+                </label>
+              </div>
+              <div class="col-sm-6">
+                <label class="option-tile" for="deliveryHotel">
+                  <input class="form-check-input" type="radio" name="delivery_type" id="deliveryHotel" value="hotel" onclick="toggleDelivery('hotel')">
+                  <span><strong>Hotel / Airbnb</strong><small>Delivered to your stay in Kenya</small></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact & Shipping Information -->
+          <div class="checkout-panel">
+            <h2 class="checkout-step"><span>2</span> Your Details</h2>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="full_name">Full Name *</label>
+                <input type="text" name="full_name" id="full_name" class="form-control" autocomplete="name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="email">Email (receipt &amp; tracking) *</label>
+                <input type="email" name="email" id="email" class="form-control" autocomplete="email" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="phone">Phone / WhatsApp *</label>
+                <input type="tel" name="phone" id="phone" class="form-control" placeholder="+254 7XX XXX XXX" autocomplete="tel" required>
+              </div>
+            </div>
+
+            <!-- Hotel Fields (Hidden by default) -->
+            <div id="hotelFields" class="row g-3 d-none pt-3">
+              <div class="col-md-8">
+                <label class="form-label" for="hotel_name">Hotel / Safari Lodge Name *</label>
+                <input type="text" name="hotel_name" id="hotel_name" class="form-control" placeholder="e.g. Mara Serena Safari Lodge">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="room_number">Room / Booking #</label>
+                <input type="text" name="room_number" id="room_number" class="form-control" placeholder="e.g. Room 104">
+              </div>
+            </div>
+
+            <!-- Home Address Fields -->
+            <div id="homeFields" class="row g-3 pt-3">
+              <div class="col-12">
+                <label class="form-label" for="address_line_1">Address / Street *</label>
+                <input type="text" name="address_line_1" id="address_line_1" class="form-control" autocomplete="address-line1" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label" for="city">City *</label>
+                <input type="text" name="city" id="city" class="form-control" autocomplete="address-level2" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label" for="country">Country *</label>
+                <input type="text" name="country" id="country" class="form-control" value="Kenya" autocomplete="country-name" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method Selection -->
+          <div class="checkout-panel">
+            <h2 class="checkout-step"><span>3</span> Payment</h2>
+            <div class="d-flex flex-column gap-2">
+              <label class="option-tile" for="payMpesa">
+                <input class="form-check-input" type="radio" name="payment_method" id="payMpesa" value="mpesa" checked>
+                <i class="fa-solid fa-mobile-screen fs-5 text-success"></i>
+                <span><strong>M-Pesa</strong><small>We'll send a payment prompt to your phone</small></span>
+              </label>
+              <label class="option-tile" for="payStripe">
+                <input class="form-check-input" type="radio" name="payment_method" id="payStripe" value="stripe">
+                <i class="fa-solid fa-credit-card fs-5 text-primary"></i>
+                <span><strong>Credit / Debit Card</strong><small>Powered by Stripe</small></span>
+              </label>
+            </div>
+
+            <!-- Gift Option -->
+            <div class="form-check mt-4">
+              <input class="form-check-input" type="checkbox" name="is_gift" id="isGift" onclick="document.getElementById('giftMessageWrap').classList.toggle('d-none')">
+              <label class="form-check-label" for="isGift">
+                <i class="fa-solid fa-gift me-1" style="color: #B4924F;"></i> This is a gift <small class="text-muted">(prices hidden on the packing slip)</small>
+              </label>
+            </div>
+            <div id="giftMessageWrap" class="d-none mt-3">
+              <textarea name="gift_message" class="form-control" rows="3" placeholder="Write your gift message here..."></textarea>
+            </div>
+          </div>
+
+          <!-- Complete Order Button -->
+          <button type="submit" class="btn btn-bush btn-lg w-100 py-3 fw-bold">
+            Place Order &middot; ${{ cart.get_total_price }}
+          </button>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">Country *</label>
-          <input type="text" name="country" class="form-control" value="Kenya" required>
-        </div>
       </div>
-    </div>
-
-    <!-- Payment Method Selection -->
-    <div class="card mt-4 p-3 border-0 shadow-sm">
-      <h5 class="fw-bold mb-3">Select Payment Method</h5>
-      <div class="form-check mb-2">
-        <input class="form-check-input" type="radio" name="payment_method" id="payMpesa" value="mpesa" checked>
-        <label class="form-check-label fw-semibold" for="payMpesa">
-          <i class="fa-solid fa-mobile-screen me-2 text-success"></i> M-Pesa STK Push
-        </label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="payment_method" id="payStripe" value="stripe">
-        <label class="form-check-label fw-semibold" for="payStripe">
-          <i class="fa-solid fa-credit-card me-2 text-primary"></i> Credit / Debit Card (Stripe)
-        </label>
-      </div>
-    </div>
-
-    <!-- Gift Option -->
-    <div class="card mt-4 p-3 border-warning bg-light">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="is_gift" id="isGift" onclick="document.getElementById('giftMessageWrap').classList.toggle('d-none')">
-        <label class="form-check-label fw-bold" for="isGift">
-          <i class="fa-solid fa-gift me-1 text-warning"></i> This is a gift (Hide prices on packing receipt)
-        </label>
-      </div>
-      <div id="giftMessageWrap" class="d-none mt-3">
-        <textarea name="gift_message" class="form-control" rows="3" placeholder="Write your gift message here..."></textarea>
-      </div>
-    </div>
-
-    <!-- Complete Order Button -->
-    <button type="submit" class="btn btn-dark btn-lg w-100 mt-4">
-      Complete Order (${{ cart.get_total_price }})
-    </button>
-  </form>
-</div>
+    </form>
+  </div>
+</section>
 
 <script>
 function toggleDelivery(type) {
@@ -115,7 +307,7 @@ function toggleDelivery(type) {
   if (type === 'hotel') {
     hotelFields.classList.remove('d-none');
     homeFields.classList.add('d-none');
-    
+
     // Adjust required field rules
     hotelInput.required = true;
     addressInput.required = false;
@@ -123,7 +315,7 @@ function toggleDelivery(type) {
   } else {
     hotelFields.classList.add('d-none');
     homeFields.classList.remove('d-none');
-    
+
     // Adjust required field rules
     hotelInput.required = false;
     addressInput.required = true;
